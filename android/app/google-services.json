@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "255263651156",
+    "project_id": "bwi-pradhan-group",
+    "storage_bucket": "bwi-pradhan-group.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:255263651156:android:0711e80085b906e064c4c1",
+        "android_client_info": {
+          "package_name": "com.example.pradhangroup"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC9NXmMYVYo_Gd585aFmqtKp2VshjpQ_Bg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
