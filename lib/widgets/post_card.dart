@@ -27,19 +27,21 @@ class PostCard extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              
               ClipRRect(
                 borderRadius: BorderRadius.circular(10.0),
                 child: CachedNetworkImage(
                   imageUrl: post.coverPic,
-                  height: 160,
-                  width: 120,
+                  height: 164,
+                  width: MediaQuery.of(context).size.width * 0.35,
                   fit: BoxFit.cover,
-                  placeholder: (context, url) => Center(child: CircularProgressIndicator()),
+                  placeholder: (context, url) =>
+                      Center(child: CircularProgressIndicator()),
                   errorWidget: (context, url, error) => Icon(Icons.error),
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(top: 10.0, bottom: 20, left: 8),
+                padding: const EdgeInsets.only(top: 0.0, bottom: 10, left: 8),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -64,9 +66,19 @@ class PostCard extends StatelessWidget {
                         fontSize: 13,
                         fontFamily: 'Lexend',
                         fontWeight: FontWeight.w300,
+                        color: Colors.green
                       ),
                     ),
-                    SizedBox(height: 18),
+                    SizedBox(height: 10),
+                    Text(
+                      "₹ ${post.price.toString()}",
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontFamily: 'Lexend',
+                        fontWeight: FontWeight.w300,
+                      ),
+                    ),
+                    SizedBox(height: 10),
                     Row(
                       children: [
                         Image.asset('assets/bloc.png', height: 18),
