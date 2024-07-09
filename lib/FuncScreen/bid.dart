@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pradhangroup/main.dart';
 
-import '../FuncScreen/Details.dart';
+import 'postDetails.dart';
 
 class bids extends StatefulWidget {
   const bids({super.key});
