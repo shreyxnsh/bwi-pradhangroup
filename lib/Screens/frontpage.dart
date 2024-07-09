@@ -1,13 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:pradhangroup/FuncScreen/Details.dart';
+import 'package:pradhangroup/FuncScreen/postDetails.dart';
 import 'package:pradhangroup/FuncScreen/rent.dart';
 import 'package:pradhangroup/Screens/profile.dart';
 import 'package:pradhangroup/functions/firebase_functions.dart';
 import 'package:pradhangroup/main.dart';
 import 'package:pradhangroup/widgets/post_card_vertical.dart';
 
-import '../FuncScreen/bid.dart';
+import '../FuncScreen/bidScreen.dart';
 import '../FuncScreen/brb.dart';
 
 class front extends StatefulWidget {
@@ -131,7 +131,7 @@ class _frontState extends State<front> {
                               width: 86,
                               decoration: BoxDecoration(
                                   color: '0095D9'.toColor(),
-                                  borderRadius: BorderRadius.only(topRight: Radius.circular(25))
+                                  borderRadius: BorderRadius.only(topRight: Radius.circular(25), bottomLeft: Radius.circular(25))
                               ),
                               child: Icon(Icons.arrow_forward_outlined , size: 27,color: Colors.white,),
                             ),
@@ -164,7 +164,7 @@ class _frontState extends State<front> {
                               width: 86,
                               decoration: BoxDecoration(
                                   color: '0095D9'.toColor(),
-                                  borderRadius: BorderRadius.only(topRight: Radius.circular(25))
+                                  borderRadius: BorderRadius.only(topRight: Radius.circular(25), bottomLeft: Radius.circular(25))
                               ),
                               child: Icon(Icons.arrow_forward_outlined , size: 27,color: Colors.white,),
                             ),
@@ -187,7 +187,7 @@ class _frontState extends State<front> {
                   ],
                 ),
               ),
-              SizedBox(height: 56,),
+              SizedBox(height: 30,),
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   GestureDetector(
@@ -238,7 +238,7 @@ class _frontState extends State<front> {
                   ),
                   GestureDetector(
                     onTap: (){
-                      Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(builder: (context) => bids()),);
+                      Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(builder: (context) => BidScreen()),);
 
                     },
                     child: Column(
