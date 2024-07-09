@@ -4,9 +4,14 @@ import 'dart:ffi';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get_storage/get_storage.dart';
 
 class FirebaseFunctions {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+
   Future<User?> fetchUserbyID(String authId) async {
     try {
       DocumentSnapshot<Map<String, dynamic>> startupSnapshot =
@@ -129,7 +134,145 @@ class FirebaseFunctions {
     }
   }
 
-  Future<void> fetchPostsById (String docId){
+
+    ValueNotifier<List<Post>> favoritePostsNotifier = ValueNotifier<List<Post>>([]);
+
+  Future<void> getFavoritePosts() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        final favoritesCollection = FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .collection('favourites');
+
+        final favoriteDocs = await favoritesCollection.get();
+
+        List<String> favoritePostIds = [];
+        for (var doc in favoriteDocs.docs) {
+          favoritePostIds.add(doc.id);
+        }
+
+        if (favoritePostIds.isNotEmpty) {
+          final postsSnapshot = await FirebaseFirestore.instance
+              .collection('posts')
+              .where(FieldPath.documentId, whereIn: favoritePostIds)
+              .get();
+
+          List<Post> favoritePosts = [];
+          for (var doc in postsSnapshot.docs) {
+            Map<String, dynamic> data = doc.data();
+
+            log('Favourite Posts : ${data.toString()}');
+            log("got data");
+            
+            favoritePosts.add(Post(
+              id: doc.id,
+              name: data['name'] ?? 'Unknown Name',
+              postType: data['postType'] ?? 'Unknown Type',
+              price: data['price'] ?? 0,
+              propertyId: data['propertyId'] ?? 'Unknown Property ID',
+              shortDescription: data['shortDescription'] ?? 'No Description',
+              description: data['description'] ?? 'No Description',
+              status: data['status'] ?? 'Unknown Status',
+              approvalStatus: data['approvalStatus'] ?? 'Unknown Approval Status',
+              email: data['contactDetails']?['email'] ?? 'No Email',
+              phone: data['contactDetails']?['phoneNo'] ?? 'No Phone Number',
+              coverPic: data['coverPic']?['url'] ?? 'No Cover Pic URL',
+              latitute: data['location']?['lat'].toString() ?? 'No Latitude',
+              longitude: data['location']?['long'].toString() ?? 'No Longitude',
+              area: data['otherDetails']?['area'] ?? 'No Area',
+              propertyOwnership:
+                  data['otherDetails']?['propertyOwnership'] ?? 'No Ownership Info',
+              transactionType:
+                  data['otherDetails']?['transactionType'] ?? 'No Transaction Type',
+              avgRating: data['ratings']?['average'].toString() ?? 'No Rating',
+              totalRating:
+                  data['ratings']?['total'].toString() ?? 'No Total Rating',
+              tags: data['tags'] != null ? List<String>.from(data['tags']) : [],
+              keywords: data['keywords'] != null
+                  ? List<String>.from(data['keywords'])
+                  : [],
+              createdAt:
+                  data['createdAt']?.toDate().toString() ?? 'No Creation Date',
+              updatedAt: data['updatedAt'] ?? 'No Update Date',
+              postBidDetails: PostBidDetails(
+                totalBidCount: data['bidDetails']?['totalBidCount'] ?? 0,
+                minimumBid: data['bidDetails']?['minimumBid'] ?? 0,
+                currentBid: data['bidDetails']?['currentBid'] ?? 0,
+                lastBidId: data['bidDetails']?['lastBidId'] ?? 'No Last Bid ID',
+                lastBidAt: data['bidDetails']?['lastBidAt'] ?? 'No Last Bid At',
+                startTime: data['bidDetails']?['startTime'] ?? 'No Start Time',
+                endTime: data['bidDetails']?['endTime'] ?? 'No End Time',
+                status: data['bidDetails']?['status'] ?? 'No Status',
+                wonUserId: data['bidDetails']?['bidWonBy']?['userId'] ??
+                    'No Winner User ID',
+                wonBidAmount: data['bidDetails']?['bidWonBy']?['bidAmount'] ?? 0,
+                wonBidId:
+                    data['bidDetails']?['bidWonBy']?['bidId'] ?? 'No Winner Bid ID',
+                wonAt:
+                    data['bidDetails']?['bidWonBy']?['wonAt'] ?? 'No Winner Bid At',
+              ),
+              categoryId: data['categoryId'] != null
+                  ? List<String>.from(data['categoryId'])
+                  : [],
+              categoryName: data['categoryName'] != null
+                  ? List<String>.from(data['categoryName'])
+                  : [],
+            ));
+          }
+
+          favoritePostsNotifier.value = favoritePosts;
+          log("Fetched favorite posts");
+        } else {
+          favoritePostsNotifier.value = [];
+          log("No favorite posts found");
+        }
+      } else {
+        log("No user is signed in.");
+      }
+    } catch (e) {
+      log("Error fetching favorite posts: $e");
+    }
+  }
+
+
+  // Add a post to favorites
+  Future<void> addPostToFavorites(String postId) async {
+    try {
+      String uid = _auth.currentUser!.uid;
+      DocumentReference userRef = _firestore.collection('users').doc(uid);
+      CollectionReference favoritesRef = userRef.collection('favourites');
+
+      await favoritesRef.doc(postId).set({
+        'postId': postId,
+        'createdAt': DateTime.now().toString(),
+      }).whenComplete(() => Fluttertoast.showToast(msg: "Post added to favorites"));
+
+      print('Post added to favorites');
+    } catch (e) {
+      print('Error adding post to favorites: $e');
+    }
+  }
+
+  // Remove a post from favorites
+  Future<void> removePostFromFavorites(String postId) async {
+    try {
+      String uid = _auth.currentUser!.uid;
+      DocumentReference userRef = _firestore.collection('users').doc(uid);
+      CollectionReference favoritesRef = userRef.collection('favourites');
+
+      await favoritesRef.doc(postId).delete().whenComplete(() => Fluttertoast.showToast(msg: "Post removed from favorites"));;
+
+      print('Post removed from favorites');
+    } catch (e) {
+      print('Error removing post from favorites: $e');
+    }
+  }
+
+
+
+  Future<void> fetchPostsById(String docId) {
     return FirebaseFirestore.instance.collection('posts').doc(docId).get();
   }
 
