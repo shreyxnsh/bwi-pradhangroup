@@ -4,14 +4,14 @@ import 'package:pradhangroup/main.dart';
 
 import 'postDetails.dart';
 
-class bids extends StatefulWidget {
-  const bids({super.key});
+class BidScreen extends StatefulWidget {
+  const BidScreen({super.key});
 
   @override
-  State<bids> createState() => _bidsState();
+  State<BidScreen> createState() => _bidsState();
 }
 
-class _bidsState extends State<bids> {
+class _bidsState extends State<BidScreen> {
   bool all = true;
   bool ongoing = false;
   bool upcoming = false;

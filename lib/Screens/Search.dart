@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pradhangroup/main.dart';
 
-import '../FuncScreen/Details.dart';
+import '../FuncScreen/postDetails.dart';
 
 class Search extends StatefulWidget {
   const Search({super.key});
@@ -34,16 +34,16 @@ class _SearchState extends State<Search> {
 
                 child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Container(
-                      height: 55,
-                      width: 55,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(27.5),
-                        color: 'F4F5FA'.toColor(),
+                    // Container(
+                    //   height: 55,
+                    //   width: 55,
+                    //   decoration: BoxDecoration(
+                    //     borderRadius: BorderRadius.circular(27.5),
+                    //     color: 'F4F5FA'.toColor(),
 
-                      ),
-                      child: Icon(Icons.arrow_back_ios_new , size: 16,),
-                    ),
+                    //   ),
+                    //   child: Icon(Icons.arrow_back_ios_new , size: 16,),
+                    // ),
                     Text('Search' , style: TextStyle(fontFamily: 'Lexend' , fontSize: 18 , fontWeight: FontWeight.w500),),
                     SizedBox(width: 55,)
 
@@ -124,7 +124,7 @@ class _SearchState extends State<Search> {
                     SizedBox(width: 14,),
                     GestureDetector(
                       onTap:(){
-                        setState(() {
+                        setState(() { 
                           refresh();
                           manesar = true;
                         });

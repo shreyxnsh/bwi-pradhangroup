@@ -4,7 +4,7 @@ import 'package:pradhangroup/functions/firebase_functions.dart';
 import 'package:pradhangroup/main.dart';
 import 'package:pradhangroup/widgets/post_card.dart';
 
-import '../FuncScreen/Details.dart';
+import '../FuncScreen/postDetails.dart';
 class Listing extends StatefulWidget {
   const Listing({super.key});
 
@@ -124,6 +124,9 @@ class _ListingState extends State<Listing> {
                     },
                   );
                 },
+              ),
+              SizedBox(
+                height: 60,
               ),
             ],
           ),
