@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:pradhangroup/FuncScreen/Details.dart';
 import 'package:pradhangroup/FuncScreen/rent.dart';
 import 'package:pradhangroup/Screens/profile.dart';
+import 'package:pradhangroup/functions/firebase_functions.dart';
 import 'package:pradhangroup/main.dart';
+import 'package:pradhangroup/widgets/post_card_vertical.dart';
 
 import '../FuncScreen/bid.dart';
 import '../FuncScreen/brb.dart';
@@ -25,6 +27,14 @@ class _frontState extends State<front> {
      top = false;
      manesar = false;
      price = false;
+  }
+  FirebaseFunctions firebaseFunctions = FirebaseFunctions();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    firebaseFunctions.fetchPostsFromFirestore();
   }
   @override
   Widget build(BuildContext context) {
@@ -434,210 +444,27 @@ class _frontState extends State<front> {
                 ),
               ),
               SizedBox(height: 28),
-              Column(crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      GestureDetector(
-                        onTap:(){
-                          // Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(builder: (context) => details()),);
-                        },
-                        child: Column(crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Stack(
-                              alignment: AlignmentDirectional.topEnd,
-                              children: [
-                                Image.asset('assets/ex2.png' , height: 164,),
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Container(
-                                    alignment: Alignment.center,
-                                    height: 28,
-                                    width: 28,
-                                    decoration: BoxDecoration(
-                                      color:'0095D9'.toColor(),
-                                      borderRadius: BorderRadius.circular(14)
-                                    ),
-                                    child: Image.asset('assets/whiteheart.png' , height: 14,),
-                                  ),
-                                )
-                              ],
-                            ),
-                            SizedBox(height: 10),
-                            Padding(
-                              padding: const EdgeInsets.only(left:8.0),
-                              child: Text('26, Sultanpur  ' , style: TextStyle(fontSize: 15, fontFamily: 'Lexend' , fontWeight: FontWeight.w400),),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(left:5.0, top: 4),
-                              child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Image.asset('assets/bloc.png' , height: 16,),
-                                      Text('0.2 Km away')
-                                    ],
-                                  ),
-                                  SizedBox(width: 23),
-                                  Image.asset('assets/rate.png',height: 18,)
-                                ],
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-
-                      GestureDetector(
-                        onTap:(){
-                          // Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(builder: (context) => details()),);
-                        },
-                        child: Column(crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Stack(alignment: AlignmentDirectional.topEnd,
-                              children: [
-                                Image.asset('assets/ex1.png' , height: 164,),
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Container(
-                                    alignment: Alignment.center,
-                                    height: 28,
-                                    width: 28,
-                                    decoration: BoxDecoration(
-                                        color:'0095D9'.toColor(),
-                                        borderRadius: BorderRadius.circular(14)
-                                    ),
-                                    child: Image.asset('assets/whiteheart.png' , height: 14,),
-                                  ),
-                                )
-                              ],
-                            ),
-                            SizedBox(height: 10),
-                            Padding(
-                              padding: const EdgeInsets.only(left:8.0),
-                              child: Text('203, Farukh Nagar  ' , style: TextStyle(fontSize: 15, fontFamily: 'Lexend' , fontWeight: FontWeight.w400),),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(left:5.0, top: 4),
-                              child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Image.asset('assets/bloc.png' , height: 16,),
-                                      Text('0.2 Km away')
-                                    ],
-                                  ),
-                                  SizedBox(width: 23),
-                                  Image.asset('assets/rate.png',height: 18,)
-                                ],
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 35,),
-                  Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      GestureDetector(
-                        onTap:(){
-                          // Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(builder: (context) => details()),);
-                        },
-                        child: Column(crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Stack(alignment: AlignmentDirectional.topEnd,
-                              children: [
-                                Image.asset('assets/ex3.png' , height: 164,),
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Container(
-                                    alignment: Alignment.center,
-                                    height: 28,
-                                    width: 28,
-                                    decoration: BoxDecoration(
-                                        color:'0095D9'.toColor(),
-                                        borderRadius: BorderRadius.circular(14)
-                                    ),
-                                    child: Image.asset('assets/whiteheart.png' , height: 14,),
-                                  ),
-                                )
-                              ],
-                            ),
-                            SizedBox(height: 10),
-                            Padding(
-                              padding: const EdgeInsets.only(left:8.0),
-                              child: Text('203, Farukh Nagar  ' , style: TextStyle(fontSize: 15, fontFamily: 'Lexend' , fontWeight: FontWeight.w400),),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(left:5.0, top: 4),
-                              child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Image.asset('assets/bloc.png' , height: 16,),
-                                      Text('0.2 Km away')
-                                    ],
-                                  ),
-                                  SizedBox(width: 23),
-                                  Image.asset('assets/rate.png',height: 18,)
-                                ],
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap:(){
-                          // Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(builder: (context) => details()),);
-                        },
-                        child: Column(crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Stack(alignment: AlignmentDirectional.topEnd,
-                              children: [
-                                Image.asset('assets/ex4.png' , height: 164,),
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Container(
-                                    alignment: Alignment.center,
-                                    height: 28,
-                                    width: 28,
-                                    decoration: BoxDecoration(
-                                        color:'0095D9'.toColor(),
-                                        borderRadius: BorderRadius.circular(14)
-                                    ),
-                                    child: Image.asset('assets/whiteheart.png' , height: 14,),
-                                  ),
-                                )
-                              ],
-                            ),
-                            SizedBox(height: 10),
-                            Padding(
-                              padding: const EdgeInsets.only(left:8.0),
-                              child: Text('203, Farukh Nagar  ' , style: TextStyle(fontSize: 15, fontFamily: 'Lexend' , fontWeight: FontWeight.w400),),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(left:5.0, top: 4),
-                              child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Image.asset('assets/bloc.png' , height: 16,),
-                                      Text('0.2 Km away')
-                                    ],
-                                  ),
-                                  SizedBox(width: 23),
-                                  Image.asset('assets/rate.png',height: 18,)
-                                ],
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+              ValueListenableBuilder<List<Post>>(
+                valueListenable: firebaseFunctions.postsNotifier,
+                builder: (context, posts, _) {
+                  return GridView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 0.62,
+                      crossAxisSpacing: 16,
+                      mainAxisSpacing: 16,
+                    ),
+                    itemCount: posts.length,
+                    itemBuilder: (context, index) {
+                      return PostCardVertical(post: posts[index]);
+                    },
+                  );
+                },
               ),
-              SizedBox(height: 50,)
+              SizedBox(height: 50),
+              // SizedBox(height: 50,)
 
 
 

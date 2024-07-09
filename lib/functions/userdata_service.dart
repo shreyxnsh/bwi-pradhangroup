@@ -1,7 +1,7 @@
 import 'package:get_storage/get_storage.dart';
 
 class UserDataService {
-  static String getUserUID() {
+   String getUserUID() {
     final storedToken = GetStorage().read('uid');
     if (storedToken != null) {
       return storedToken;
@@ -9,7 +9,7 @@ class UserDataService {
     return '';
   }
 
-  static String getUserName() {
+   static String getUserName() {
     final userName = GetStorage().read('name');
     if (userName != null) {
       return userName;
@@ -17,7 +17,7 @@ class UserDataService {
     return '';
   }
 
-  static String getUserPhoneNo() {
+   static String getUserPhoneNo() {
     final userPhone = GetStorage().read('phoneNo');
     if (userPhone != null) {
       return userPhone;
@@ -25,7 +25,7 @@ class UserDataService {
     return '';
   }
 
-  static DateTime getUserCreatedAt() {
+   DateTime getUserCreatedAt() {
     final userTime = GetStorage().read('createdAt');
     if (userTime != null) {
       return userTime;
@@ -33,7 +33,7 @@ class UserDataService {
     return DateTime.now();
   }
 
-  static bool getUserIsVerified() {
+   bool getUserIsVerified() {
     final isVerified = GetStorage().read('isVerified');
     if (isVerified != null) {
       return isVerified;
