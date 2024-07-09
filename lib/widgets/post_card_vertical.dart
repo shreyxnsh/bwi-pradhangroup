@@ -1,19 +1,31 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:pradhangroup/FuncScreen/Details.dart';
+import 'package:pradhangroup/FuncScreen/postDetails.dart';
 import 'package:pradhangroup/functions/firebase_functions.dart';
 import 'package:pradhangroup/main.dart';
 
-class PostCardVertical extends StatelessWidget {
+class PostCardVertical extends StatefulWidget {
   final Post post;
 
   const PostCardVertical({Key? key, required this.post}) : super(key: key);
 
   @override
+  State<PostCardVertical> createState() => _PostCardVerticalState();
+}
+
+class _PostCardVerticalState extends State<PostCardVertical> {
+  bool like = false;
+
+  @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(builder: (context) => details(post: post,)),);
+        Navigator.of(context, rootNavigator: true).push(
+          MaterialPageRoute(
+              builder: (context) => PostDetailScreen(
+                    post: widget.post,
+                  )),
+        );
       },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -24,7 +36,7 @@ class PostCardVertical extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(10.0),
                 child: CachedNetworkImage(
-                  imageUrl: post.coverPic,
+                  imageUrl: widget.post.coverPic,
                   height: 164,
                   width: MediaQuery.of(context).size.width,
                   fit: BoxFit.cover,
@@ -33,28 +45,41 @@ class PostCardVertical extends StatelessWidget {
                   errorWidget: (context, url, error) => Icon(Icons.error),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  alignment: Alignment.center,
-                  height: 28,
-                  width: 28,
-                  decoration: BoxDecoration(
-                      color: '0095D9'.toColor(),
-                      borderRadius: BorderRadius.circular(14)),
-                  child: Image.asset(
-                    'assets/whiteheart.png',
-                    height: 14,
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    like = !like;
+                  });
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    alignment: Alignment.center,
+                    height: 35,
+                    width: 35,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(27.5),
+                      color: (like == true) ? '0095D9'.toColor() : Colors.white,
+                    ),
+                    child: (like == true)
+                        ? Image.asset(
+                            'assets/whiteheart.png',
+                            height: 14,
+                          )
+                        : Image.asset(
+                            'assets/bheart.png',
+                            height: 14,
+                          ),
                   ),
                 ),
-              )
+              ),
             ],
           ),
           SizedBox(height: 10),
           Padding(
             padding: const EdgeInsets.only(left: 8.0),
             child: Text(
-              post.name,
+              widget.post.name,
               style: TextStyle(
                   fontSize: 15,
                   fontFamily: 'Lexend',
@@ -73,7 +98,7 @@ class PostCardVertical extends StatelessWidget {
                       'assets/bloc.png',
                       height: 16,
                     ),
-                    Text(post.latitute)
+                    Text(widget.post.latitute)
                   ],
                 ),
                 SizedBox(width: 23),
@@ -86,7 +111,7 @@ class PostCardVertical extends StatelessWidget {
                     SizedBox(
                       width: 6,
                     ),
-                    Text(post.avgRating.toString())
+                    Text(widget.post.avgRating.toString())
                   ],
                 )
               ],

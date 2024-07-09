@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:pradhangroup/FuncScreen/Details.dart';
+import 'package:pradhangroup/FuncScreen/postDetails.dart';
 import 'package:pradhangroup/functions/firebase_functions.dart';
 import 'package:pradhangroup/main.dart';
 
@@ -13,7 +13,7 @@ class PostCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(builder: (context) => details(post: post,)));
+        Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(builder: (context) => PostDetailScreen(post: post,)));
       },
       child: Container(
         width: MediaQuery.of(context).size.width,
