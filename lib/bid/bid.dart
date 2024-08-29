@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -10,6 +13,7 @@ import 'package:pradhangroup/bid/biddone.dart';
 import 'package:pradhangroup/functions/firebase_functions.dart';
 import 'package:pradhangroup/functions/userdata_service.dart';
 import 'package:pradhangroup/main.dart';
+import 'package:http/http.dart' as http;
 
 class bid extends StatefulWidget {
   const bid({super.key, required this.post});
@@ -27,66 +31,54 @@ class _bidState extends State<bid> {
   bool isBidding = false;
 
   Future<void> placeBid() async {
+    String placeBidUrl =
+        "https://us-central1-bwi-pradhan-group.cloudfunctions.net/post-add";
     try {
-      await FirebaseFirestore.instance
-          .collection('posts')
-          .doc(widget.post.id)
-          .update({
-        'bidDetails': {
-          'currentBid': int.parse(amountController.text),
-          // store time in this format 2023-06-15T17:00:00Z
-          'lastBidAt': DateTime.now().toString(),
-          'lastBidId': FirebaseAuth.instance.currentUser!.uid,
-          'startTime' : widget.post.postBidDetails.startTime,
-          'endTime' : widget.post.postBidDetails.endTime,
-          'minimumBid' : widget.post.postBidDetails.minimumBid,
-          'status' : widget.post.postBidDetails.status,
-        },
-        'totalBidCount': widget.post.postBidDetails.totalBidCount + 1,
-        // update id and name in the topBidder array at the 0th index
-        
-      }).whenComplete(() => print('Bid placed successfully'));
-      // await FirebaseFirestore.instance
-      //     .collection('posts')
-      //     .doc(widget.post.id)
-      //     .set({
-       
-      //     'topBidders': [
-      //     {
-      //       'id': FirebaseAuth.instance.currentUser!.uid,
-      //       'name': userName,
-      //       'amount': int.parse(amountController.text),
-      //     }
-      //   ]
-      // }, SetOptions(merge: true));
-        
-      // add bidding details in the biddings collection of this post's document
-      await FirebaseFirestore.instance
-          .collection('posts')
-          .doc(widget.post.id)
-          .collection('biddings')
-          .add({
-        // add data in bidBy map
-        'bidBy': {
-          'id': FirebaseAuth.instance.currentUser!.uid,
-          'name': userName,
-        },
-        'createdAt': DateTime.now().toString(),
-        'biddingNumber': widget.post.postBidDetails.totalBidCount + 1,
-        'bidPrice': int.parse(amountController.text),
+      setState(() {
+        isBidding = true;
       });
+
+      log("Post Bid URL : $placeBidUrl");
+
+      var headers = {
+        'Content-Type': 'application/json',
+      };
+      var request = http.Request('POST', Uri.parse(placeBidUrl));
+      request.body = json.encode({
+        "data": {
+          "postId": widget.post.id,
+          "userId": FirebaseAuth.instance.currentUser!.uid,
+          "name": userName,
+          "amount": int.parse(amountController.text),
+        }
+      });
+
+      request.headers.addAll(headers);
+      log("Request : ${request.body}");
+      http.StreamedResponse response = await request.send();
+      log("response : ${response.statusCode}");
+
+      Map<String, dynamic> jsonResponse =
+          jsonDecode(await response.stream.bytesToString());
+
+      log("response : ${jsonResponse}");
+
+      if (jsonResponse['result']['status'] == 'true') {
+        log("Bid Placed Successfully");
+        Fluttertoast.showToast(msg: jsonResponse['result']['msg']);
+        Navigator.of(context, rootNavigator: true).push(
+          MaterialPageRoute(builder: (context) => biddone()),
+        );
+      } else {
+        log("Error Placing Bid");
+        Fluttertoast.showToast(msg: jsonResponse['result']['msg']);
+      }
 
       setState(() {
         isBidding = false;
       });
-
-      Navigator.of(context, rootNavigator: true).push(
-        MaterialPageRoute(builder: (context) => biddone()),
-      );
-
-      // notifyListeners();
     } catch (e) {
-      Fluttertoast.showToast(msg: 'Error adding post: $e');
+      Fluttertoast.showToast(msg: 'Error bidding post : $e');
       print('Error adding post: $e');
     }
   }
@@ -187,7 +179,7 @@ class _bidState extends State<bid> {
                                 height: 10,
                               ),
                               Text(
-                                'Available for Sale',
+                                'Available for ${widget.post.postType}',
                                 style: TextStyle(
                                     fontSize: 13,
                                     fontFamily: 'Lexend',
@@ -201,7 +193,7 @@ class _bidState extends State<bid> {
                                     height: 18,
                                   ),
                                   Text(
-                                    widget.post.latitute,
+                                    widget.post.city,
                                     style: TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.w400),
@@ -294,14 +286,21 @@ class _bidState extends State<bid> {
                     // isBidding ? CircularProgressIndicator() : placeBid();
                     // if(amountController.text)
                   },
-                  child: Container(
+                  child: 
+                
+                  
+                  Container(
                     height: 60,
                     width: double.maxFinite,
                     decoration: BoxDecoration(
                         color: Colors.black,
                         borderRadius: BorderRadius.circular(20)),
                     child: Center(
-                        child: Text(
+                        child: 
+                          isBidding
+                      ? CircularProgressIndicator(color: Colors.white,)
+                      :
+                        Text(
                       'Place Bid',
                       style: TextStyle(
                           fontWeight: FontWeight.w400,

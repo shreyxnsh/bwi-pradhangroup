@@ -1,32 +1,44 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:pradhangroup/main.dart';
+import 'dart:developer';
 
-import 'postDetails.dart';
+import 'package:flutter/material.dart';
+import 'package:pradhangroup/functions/firebase_functions.dart';
+import 'package:pradhangroup/main.dart';
+import 'package:pradhangroup/widgets/post_card.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class BidScreen extends StatefulWidget {
   const BidScreen({super.key});
 
   @override
-  State<BidScreen> createState() => _bidsState();
+  State<BidScreen> createState() => _BidScreenState();
 }
 
-class _bidsState extends State<BidScreen> {
+class _BidScreenState extends State<BidScreen> {
   bool all = true;
   bool ongoing = false;
   bool upcoming = false;
+
+  FirebaseFunctions firebaseFunctions = FirebaseFunctions();
+
+  @override
+  void initState() {
+    super.initState();
+    firebaseFunctions.fetchPostsFromFirestore();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.only(left: 20.0 , right: 20 , top: 76),
+          padding: const EdgeInsets.only(left: 20.0, right: 20, top: 76),
           child: Column(
             children: [
-              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   GestureDetector(
-                    onTap:(){
+                    onTap: () {
                       Navigator.pop(context);
                     },
                     child: Container(
@@ -35,31 +47,44 @@ class _bidsState extends State<BidScreen> {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(27.5),
                         color: 'F4F5FA'.toColor(),
-
                       ),
-                      child: Icon(Icons.arrow_back_ios_new , size: 16,),
+                      child: Icon(
+                        Icons.arrow_back_ios_new,
+                        size: 16,
+                      ),
                     ),
                   ),
-                  Text("Bid Property", style: TextStyle(fontWeight: FontWeight.w500 , fontFamily: 'Lexend', fontSize: 18),),
+                  Text(
+                    "Bid Property",
+                    style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontFamily: 'Lexend',
+                        fontSize: 18),
+                  ),
                   Container(
                     height: 55,
                     width: 55,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(27.5),
                       color: 'F4F5FA'.toColor(),
-
                     ),
-                    child: Icon(Icons.search_outlined , size: 18,),
+                    child: Icon(
+                      Icons.search_outlined,
+                      size: 18,
+                    ),
                   ),
                 ],
               ),
-              SizedBox(height: 35,),
-              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              SizedBox(
+                height: 25,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Row(
                     children: [
                       GestureDetector(
-                        onTap: (){
+                        onTap: () {
                           setState(() {
                             all = true;
                             ongoing = false;
@@ -70,15 +95,27 @@ class _bidsState extends State<BidScreen> {
                           height: 50,
                           width: 65,
                           decoration: BoxDecoration(
-                              color: (all == true)?'262425'.toColor():'F4F5FA'.toColor(),
-                              borderRadius: BorderRadius.circular(20)
+                            color: (all == true)
+                                ? '262425'.toColor()
+                                : 'F4F5FA'.toColor(),
+                            borderRadius: BorderRadius.circular(20),
                           ),
-                          child: Center(child: Text('All' , style: TextStyle(fontSize: 12, fontWeight: (all == true)?FontWeight.w700:FontWeight.w300 , color: (all == true)?Colors.white:Colors.black),)),
+                          child: Center(
+                            child: Text('All',
+                                style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: (all == true)
+                                        ? FontWeight.w700
+                                        : FontWeight.w300,
+                                    color: (all == true)
+                                        ? Colors.white
+                                        : Colors.black)),
+                          ),
                         ),
                       ),
-                      SizedBox(width: 12,),
+                      SizedBox(width: 12),
                       GestureDetector(
-                        onTap: (){
+                        onTap: () {
                           setState(() {
                             all = false;
                             ongoing = true;
@@ -89,15 +126,27 @@ class _bidsState extends State<BidScreen> {
                           height: 50,
                           width: 65,
                           decoration: BoxDecoration(
-                              color: (ongoing == true)?'262425'.toColor():'F4F5FA'.toColor(),
-                              borderRadius: BorderRadius.circular(20)
+                            color: (ongoing == true)
+                                ? '262425'.toColor()
+                                : 'F4F5FA'.toColor(),
+                            borderRadius: BorderRadius.circular(20),
                           ),
-                          child: Center(child: Text('Ongoing' , style: TextStyle(fontSize: 12, fontWeight: (ongoing == true)?FontWeight.w700:FontWeight.w300 , color: (ongoing == true)?Colors.white:Colors.black),)),
+                          child: Center(
+                            child: Text('Ongoing',
+                                style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: (ongoing == true)
+                                        ? FontWeight.w700
+                                        : FontWeight.w300,
+                                    color: (ongoing == true)
+                                        ? Colors.white
+                                        : Colors.black)),
+                          ),
                         ),
                       ),
-                      SizedBox(width: 12,),
+                      SizedBox(width: 12),
                       GestureDetector(
-                        onTap: (){
+                        onTap: () {
                           setState(() {
                             all = false;
                             ongoing = false;
@@ -108,243 +157,100 @@ class _bidsState extends State<BidScreen> {
                           height: 50,
                           width: 75,
                           decoration: BoxDecoration(
-                              color: (upcoming == true)?'262425'.toColor():'F4F5FA'.toColor(),
-                              borderRadius: BorderRadius.circular(20)
+                            color: (upcoming == true)
+                                ? '262425'.toColor()
+                                : 'F4F5FA'.toColor(),
+                            borderRadius: BorderRadius.circular(20),
                           ),
-                          child: Center(child: Text('Upcoming' , style: TextStyle(fontSize: 12, fontWeight: (upcoming == true)?FontWeight.w700:FontWeight.w300 , color: (upcoming == true)?Colors.white:Colors.black),)),
+                          child: Center(
+                            child: Text('Upcoming',
+                                style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: (upcoming == true)
+                                        ? FontWeight.w700
+                                        : FontWeight.w300,
+                                    color: (upcoming == true)
+                                        ? Colors.white
+                                        : Colors.black)),
+                          ),
                         ),
                       ),
                     ],
                   ),
-                  Image.asset('assets/options.png'  , height: 47,)
                 ],
               ),
-              SizedBox(height: 11,),
-              Column(
-                children: [
-                  GestureDetector(
-                    onTap:(){
-                      // Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(builder: (context) => details()),);
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                          color: 'F4F5FA'.toColor(),
-                          borderRadius: BorderRadius.circular(25)
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.only(top:10, left: 10 , bottom: 10),
-                        child: Row(crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Image.asset('assets/ex2.png' , height: 160,),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 10.0, bottom: 20 , left: 16),
-                              child: Column(crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('1451, IIMT,\nGurgaon',style: TextStyle(fontSize: 14, fontFamily: 'Lexend'),),
-                                  SizedBox(height: 10,),
-                                  Image.asset('assets/rate.png' , height: 18,),
-                                  SizedBox(height: 10,),
-                                  Text('Available for Rent', style: TextStyle(fontSize: 13 ,fontFamily: 'Lexend' ,fontWeight: FontWeight.w300),),
-                                  SizedBox(height: 18),
-                                  Row(
-                                    children: [
-                                      Image.asset('assets/bloc.png' , height: 18,),
-                                      Text('New Delhi', style: TextStyle(fontSize: 12 , fontWeight: FontWeight.w400),)
-                                    ],
-                                  )
-                                ],
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 8.0 , left: 25),
-                              child: Align(child: Icon(Icons.delete_outline), alignment: Alignment.topRight,),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
+              ValueListenableBuilder<List<Post>>(
+                valueListenable: firebaseFunctions.postsNotifier,
+                builder: (context, posts, _) {
+                  // Filter posts based on the selected tab
+                  final filteredPosts = _filterPosts(posts.where((post) => post.postType == 'bid').toList());
 
-                  SizedBox(height: 15,),
-                  GestureDetector(
-                    onTap:(){
-                      // Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(builder: (context) => details()),);
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: filteredPosts.length,
+                    itemBuilder: (context, index) {
+                      return PostCard(post: filteredPosts[index]);
                     },
-                    child: Container(
-                      decoration: BoxDecoration(
-                          color: 'F4F5FA'.toColor(),
-                          borderRadius: BorderRadius.circular(25)
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.only(top:10, left: 10 , bottom: 10),
-                        child: Row(crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Image.asset('assets/ex1.png' , height: 160,),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 10.0, bottom: 20 , left: 16),
-                              child: Column(crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('2011, Sultanpur,\nManesar',style: TextStyle(fontSize: 14, fontFamily: 'Lexend'),),
-                                  SizedBox(height: 10,),
-                                  Image.asset('assets/rate.png' , height: 18,),
-                                  SizedBox(height: 10,),
-                                  Text('Available for Rent', style: TextStyle(fontSize: 13 ,fontFamily: 'Lexend' ,fontWeight: FontWeight.w300),),
-                                  SizedBox(height: 18),
-                                  Row(
-                                    children: [
-                                      Image.asset('assets/bloc.png' , height: 18,),
-                                      Text('New Delhi', style: TextStyle(fontSize: 12 , fontWeight: FontWeight.w400),)
-                                    ],
-                                  )
-                                ],
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 8.0 , left: 25),
-                              child: Align(child: Icon(Icons.delete_outline), alignment: Alignment.topRight,),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 15,),
-                  GestureDetector(
-                    onTap:(){
-                      // Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(builder: (context) => details()),);
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                          color: 'F4F5FA'.toColor(),
-                          borderRadius: BorderRadius.circular(25)
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.only(top:10, left: 10 , bottom: 10),
-                        child: Row(crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Image.asset('assets/ex4.png' , height: 160,),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 10.0, bottom: 20 , left: 16),
-                              child: Column(crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('1202, Sultanpur,\nManesar',style: TextStyle(fontSize: 14, fontFamily: 'Lexend'),),
-                                  SizedBox(height: 10,),
-                                  Image.asset('assets/rate.png' , height: 18,),
-                                  SizedBox(height: 10,),
-                                  Text('Available for Rent', style: TextStyle(fontSize: 13 ,fontFamily: 'Lexend' ,fontWeight: FontWeight.w300),),
-                                  SizedBox(height: 18),
-                                  Row(
-                                    children: [
-                                      Image.asset('assets/bloc.png' , height: 18,),
-                                      Text('New Delhi', style: TextStyle(fontSize: 12 , fontWeight: FontWeight.w400),)
-                                    ],
-                                  )
-                                ],
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 8.0 , left: 25),
-                              child: Align(child: Icon(Icons.delete_outline), alignment: Alignment.topRight,),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  SizedBox(height: 15,),
-                  GestureDetector(
-                    onTap:(){
-                      // Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(builder: (context) => details()),);
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                          color: 'F4F5FA'.toColor(),
-                          borderRadius: BorderRadius.circular(25)
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.only(top:10, left: 10 , bottom: 10),
-                        child: Row(crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Image.asset('assets/ex3.png' , height: 160,),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 10.0, bottom: 20 , left: 16),
-                              child: Column(crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('900, Pace city,\nGurgaon',style: TextStyle(fontSize: 14, fontFamily: 'Lexend'),),
-                                  SizedBox(height: 10,),
-                                  Image.asset('assets/rate.png' , height: 18,),
-                                  SizedBox(height: 10,),
-                                  Text('Available for Rent', style: TextStyle(fontSize: 13 ,fontFamily: 'Lexend' ,fontWeight: FontWeight.w300),),
-                                  SizedBox(height: 18),
-                                  Row(
-                                    children: [
-                                      Image.asset('assets/bloc.png' , height: 18,),
-                                      Text('New Delhi', style: TextStyle(fontSize: 12 , fontWeight: FontWeight.w400),)
-                                    ],
-                                  )
-                                ],
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 8.0 , left: 25),
-                              child: Align(child: Icon(Icons.delete_outline), alignment: Alignment.topRight,),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 15,),
-                  GestureDetector(
-                    onTap:(){
-                      // Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(builder: (context) => details()),);
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                          color: 'F4F5FA'.toColor(),
-                          borderRadius: BorderRadius.circular(25)
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.only(top:10, left: 10 , bottom: 10),
-                        child: Row(crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Image.asset('assets/ex1.png' , height: 160,),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 10.0, bottom: 20 , left: 16),
-                              child: Column(crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('2011, Sultanpur,\nManesar',style: TextStyle(fontSize: 14, fontFamily: 'Lexend'),),
-                                  SizedBox(height: 10,),
-                                  Image.asset('assets/rate.png' , height: 18,),
-                                  SizedBox(height: 10,),
-                                  Text('Available for Rent', style: TextStyle(fontSize: 13 ,fontFamily: 'Lexend' ,fontWeight: FontWeight.w300),),
-                                  SizedBox(height: 18),
-                                  Row(
-                                    children: [
-                                      Image.asset('assets/bloc.png' , height: 18,),
-                                      Text('New Delhi', style: TextStyle(fontSize: 12 , fontWeight: FontWeight.w400),)
-                                    ],
-                                  )
-                                ],
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 8.0 , left: 25),
-                              child: Align(child: Icon(Icons.delete_outline), alignment: Alignment.topRight,),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              )
-
+                  );
+                },
+              ),
+              SizedBox(
+                height: 60,
+              ),
             ],
           ),
         ),
       ),
     );
   }
+
+    int extractSeconds(String timestamp) {
+    RegExp regex = RegExp(r"seconds=(\d+),");
+    Match? match = regex.firstMatch(timestamp);
+    if (match != null) {
+      return int.parse(match.group(1)!);
+    }
+    throw Exception("Invalid Timestamp format");
+  }
+
+  List<Post> _filterPosts(List<Post> posts) {
+     final DateTime currentTime = DateTime.now();
+     log("Posts : ${posts.toString()}" , name: "TABS");
+
+    if (all) {
+      return posts.where((post) => post.postType == 'bid').toList();
+    } else if (ongoing) {
+      return posts.where((post) {
+        log("Start Time : ${post.postBidDetails.startTime}" , name: "TABS");
+        log("End Time : ${post.postBidDetails.endTime}" , name: "TABS");
+        log("End Time : ${post.postBidDetails.toString()}" , name: "TABS");
+
+        
+        final DateTime startTime =  DateTime.fromMillisecondsSinceEpoch(
+                          extractSeconds(post.postBidDetails.startTime) *
+                              1000);
+        final DateTime endTime = DateTime.fromMillisecondsSinceEpoch(
+                          extractSeconds(post.postBidDetails.endTime) *
+                              1000);
+
+                              log("Start Time after conversion : ${startTime.toString()}" , name: "TABS");
+                              log("End Time after conversion : ${endTime.toString()}" , name: "TABS");
+        return post.postType == 'bid' &&
+            currentTime.isAfter(startTime) &&
+                      currentTime.isBefore(endTime);
+
+            // currentTime.isAfter(startTime)
+      }).toList();
+    } else if (upcoming) {
+      return posts.where((post) {
+        final DateTime startTime =  DateTime.fromMillisecondsSinceEpoch(
+                          extractSeconds(post.postBidDetails.startTime) *
+                              1000);
+        return post.postType == 'bid' && currentTime.isBefore(startTime);
+      }).toList();
+    }
+    return [];
+  }
 }
+

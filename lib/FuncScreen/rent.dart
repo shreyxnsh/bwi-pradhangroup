@@ -18,7 +18,6 @@ class _rentState extends State<rent> {
   bool ongoing = false;
   bool upcoming = false;
 
-  
   FirebaseFunctions firebaseFunctions = FirebaseFunctions();
 
   @override
@@ -32,13 +31,14 @@ class _rentState extends State<rent> {
     return Scaffold(
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.only(left: 20.0 , right: 20 , top: 76),
+          padding: const EdgeInsets.only(left: 20.0, right: 20, top: 76),
           child: Column(
             children: [
-              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   GestureDetector(
-                    onTap:(){
+                    onTap: () {
                       Navigator.pop(context);
                     },
                     child: Container(
@@ -47,117 +47,127 @@ class _rentState extends State<rent> {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(27.5),
                         color: 'F4F5FA'.toColor(),
-
                       ),
-                      child: Icon(Icons.arrow_back_ios_new , size: 16,),
+                      child: Icon(
+                        Icons.arrow_back_ios_new,
+                        size: 16,
+                      ),
                     ),
                   ),
-                  Text("Rent Property", style: TextStyle(fontWeight: FontWeight.w500 , fontFamily: 'Lexend', fontSize: 18),),
+                  Text(
+                    "Rent Property",
+                    style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontFamily: 'Lexend',
+                        fontSize: 18),
+                  ),
                   Container(
                     height: 55,
                     width: 55,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(27.5),
                       color: 'F4F5FA'.toColor(),
-
                     ),
-                    child: Icon(Icons.search_outlined , size: 18,),
+                    child: Icon(
+                      Icons.search_outlined,
+                      size: 18,
+                    ),
                   ),
                 ],
               ),
-              SizedBox(height: 25,),
-              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            all = true;
-                            ongoing = false;
-                            upcoming = false;
-                          });
-                        },
-                        child: Container(
-                          height: 50,
-                          width: 65,
-                          decoration: BoxDecoration(
-                            color: (all == true) ? '262425'.toColor() : 'F4F5FA'.toColor(),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Center(
-                            child: Text('All', style: TextStyle(fontSize: 12, fontWeight: (all == true) ? FontWeight.w700 : FontWeight.w300, color: (all == true) ? Colors.white : Colors.black)),
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 12),
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            all = false;
-                            ongoing = true;
-                            upcoming = false;
-                          });
-                        },
-                        child: Container(
-                          height: 50,
-                          width: 65,
-                          decoration: BoxDecoration(
-                            color: (ongoing == true) ? '262425'.toColor() : 'F4F5FA'.toColor(),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Center(
-                            child: Text('Ongoing', style: TextStyle(fontSize: 12, fontWeight: (ongoing == true) ? FontWeight.w700 : FontWeight.w300, color: (ongoing == true) ? Colors.white : Colors.black)),
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 12),
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            all = false;
-                            ongoing = false;
-                            upcoming = true;
-                          });
-                        },
-                        child: Container(
-                          height: 50,
-                          width: 75,
-                          decoration: BoxDecoration(
-                            color: (upcoming == true) ? '262425'.toColor() : 'F4F5FA'.toColor(),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Center(
-                            child: Text('Upcoming', style: TextStyle(fontSize: 12, fontWeight: (upcoming == true) ? FontWeight.w700 : FontWeight.w300, color: (upcoming == true) ? Colors.white : Colors.black)),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Image.asset('assets/options.png', height: 47),
-                ],
-              ),
+              // SizedBox(height: 25,),
+              // Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //   children: [
+              //     Row(
+              //       children: [
+              //         GestureDetector(
+              //           onTap: () {
+              //             setState(() {
+              //               all = true;
+              //               ongoing = false;
+              //               upcoming = false;
+              //             });
+              //           },
+              //           child: Container(
+              //             height: 50,
+              //             width: 65,
+              //             decoration: BoxDecoration(
+              //               color: (all == true) ? '262425'.toColor() : 'F4F5FA'.toColor(),
+              //               borderRadius: BorderRadius.circular(20),
+              //             ),
+              //             child: Center(
+              //               child: Text('All', style: TextStyle(fontSize: 12, fontWeight: (all == true) ? FontWeight.w700 : FontWeight.w300, color: (all == true) ? Colors.white : Colors.black)),
+              //             ),
+              //           ),
+              //         ),
+              //         SizedBox(width: 12),
+              //         GestureDetector(
+              //           onTap: () {
+              //             setState(() {
+              //               all = false;
+              //               ongoing = true;
+              //               upcoming = false;
+              //             });
+              //           },
+              //           child: Container(
+              //             height: 50,
+              //             width: 65,
+              //             decoration: BoxDecoration(
+              //               color: (ongoing == true) ? '262425'.toColor() : 'F4F5FA'.toColor(),
+              //               borderRadius: BorderRadius.circular(20),
+              //             ),
+              //             child: Center(
+              //               child: Text('Ongoing', style: TextStyle(fontSize: 12, fontWeight: (ongoing == true) ? FontWeight.w700 : FontWeight.w300, color: (ongoing == true) ? Colors.white : Colors.black)),
+              //             ),
+              //           ),
+              //         ),
+              //         SizedBox(width: 12),
+              //         GestureDetector(
+              //           onTap: () {
+              //             setState(() {
+              //               all = false;
+              //               ongoing = false;
+              //               upcoming = true;
+              //             });
+              //           },
+              //           child: Container(
+              //             height: 50,
+              //             width: 75,
+              //             decoration: BoxDecoration(
+              //               color: (upcoming == true) ? '262425'.toColor() : 'F4F5FA'.toColor(),
+              //               borderRadius: BorderRadius.circular(20),
+              //             ),
+              //             child: Center(
+              //               child: Text('Upcoming', style: TextStyle(fontSize: 12, fontWeight: (upcoming == true) ? FontWeight.w700 : FontWeight.w300, color: (upcoming == true) ? Colors.white : Colors.black)),
+              //             ),
+              //           ),
+              //         ),
+              //       ],
+              //     ),
+              //     Image.asset('assets/options.png', height: 47),
+              //   ],
+              // ),
               // SizedBox(height: 11),
               ValueListenableBuilder<List<Post>>(
-  valueListenable: firebaseFunctions.postsNotifier,
-  builder: (context, posts, _) {
-    // Filter posts to include only those with transactionType as "sale"
-    final salePosts = posts.where((post) => post.transactionType == 'rent').toList();
+                valueListenable: firebaseFunctions.postsNotifier,
+                builder: (context, posts, _) {
+                  // Filter posts to include only those with transactionType as "sale"
+                  final salePosts =
+                      posts.where((post) => post.postType == 'rent').toList();
 
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
-      itemCount: salePosts.length,
-      itemBuilder: (context, index) {
-        return PostCard(post: salePosts[index]);
-      },
-    );
-  },
-),
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: salePosts.length,
+                    itemBuilder: (context, index) {
+                      return PostCard(post: salePosts[index]);
+                    },
+                  );
+                },
+              ),
               SizedBox(
                 height: 60,
               ),
-
             ],
           ),
         ),
