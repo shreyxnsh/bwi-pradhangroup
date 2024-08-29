@@ -109,6 +109,13 @@ class _OTPVerificationLoginState extends State<OTPVerificationLogin> {
     await box.write('createdAt', userData.createdAt);
     await box.write('isVerified', userData.isVerified);
     await box.write('uid', userData.uid);
+
+    log("User Data : $userData");
+    log("User Data : ${box.read('name')}");
+    log("User Data : ${box.read('phoneNo')}");
+    log("User Data : ${box.read('createdAt')}");
+    log("User Data : ${box.read('isVerified')}");
+    log("User Data : ${box.read('uid')}");
   }
 
 

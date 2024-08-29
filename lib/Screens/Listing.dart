@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:pradhangroup/Screens/Search.dart';
 import 'package:pradhangroup/functions/firebase_functions.dart';
 import 'package:pradhangroup/main.dart';
 import 'package:pradhangroup/widgets/post_card.dart';
@@ -36,7 +38,10 @@ class _ListingState extends State<Listing> {
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text("Listing", style: TextStyle(fontWeight: FontWeight.w500, fontFamily: 'Lexend', fontSize: 18)),
-                  Icon(Icons.search, size: 27)
+                   GestureDetector(
+                    onTap: () {
+                      Get.to(() => Search() , transition: Transition.rightToLeftWithFade);
+                    }, child: Icon(Icons.search, size: 27)),
                 ],
               ),
               SizedBox(height: 35),

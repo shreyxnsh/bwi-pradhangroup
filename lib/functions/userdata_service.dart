@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get_storage/get_storage.dart';
 
 class UserDataService {
@@ -25,12 +26,12 @@ class UserDataService {
     return '';
   }
 
-   DateTime getUserCreatedAt() {
+   Timestamp getUserCreatedAt() {
     final userTime = GetStorage().read('createdAt');
     if (userTime != null) {
       return userTime;
     }
-    return DateTime.now();
+    return userTime;
   }
 
    bool getUserIsVerified() {
