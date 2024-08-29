@@ -1,12 +1,21 @@
+import 'dart:developer';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_api/flutter_native_api.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
+import 'package:pradhangroup/FuncScreen/query.dart';
+import 'package:pradhangroup/FuncScreen/widgets/countdownTimer.dart';
+import 'package:pradhangroup/Screens/ViewAllScreen.dart';
+import 'package:pradhangroup/Screens/map.dart';
 import 'package:pradhangroup/functions/firebase_functions.dart';
 import 'package:pradhangroup/functions/localStorage.dart';
 import 'package:pradhangroup/main.dart';
+import 'package:pradhangroup/widgets/post_card_vertical.dart';
 import 'package:slide_countdown/slide_countdown.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../bid/bid.dart';
 
@@ -20,13 +29,28 @@ class PostDetailScreen extends StatefulWidget {
 
 class _detailsState extends State<PostDetailScreen> {
   bool rent = true;
-  bool buy = false;
-    bool like = false;
+  bool buy = true;
+  bool like = false;
+
+  FirebaseFunctions firebaseFunctions = FirebaseFunctions();
 
   @override
   void initState() {
     super.initState();
+    log("TYPE : ${widget.post.postType}");
     _checkIfLiked();
+    firebaseFunctions.fetchPostsFromFirestore();
+    log("Latitude : ${widget.post.latitute}", name: "ISSUES");
+    log("Longitude : ${widget.post.longitude}", name: "ISSUES");
+  }
+
+  int extractSeconds(String timestamp) {
+    RegExp regex = RegExp(r"seconds=(\d+),");
+    Match? match = regex.firstMatch(timestamp);
+    if (match != null) {
+      return int.parse(match.group(1)!);
+    }
+    throw Exception("Invalid Timestamp format");
   }
 
   Future<void> _checkIfLiked() async {
@@ -35,35 +59,82 @@ class _detailsState extends State<PostDetailScreen> {
       like = isLiked;
     });
   }
+
   @override
   Widget build(BuildContext context) {
+    double latitude =
+        widget.post.latitute.isEmpty ? 0.0 : double.parse(widget.post.latitute);
+    double longitude = widget.post.latitute.isEmpty
+        ? 0.0
+        : double.parse(widget.post.longitude);
+    log("Latitude : ${widget.post.latitute}", name: "ISSUES 2");
+    log("Longitude : ${widget.post.longitude}", name: "ISSUES 2");
+
+    log("Start time : ${widget.post.postBidDetails.startTime}");
+    log("End time : ${widget.post.postBidDetails.endTime}");
     return Scaffold(
       bottomNavigationBar: (buy == true)
           ? Padding(
               padding: const EdgeInsets.all(15),
               child: GestureDetector(
                 onTap: () {
-                  Get.to(
-                      () => bid(
-                            post: widget.post,
-                          ),
-                      transition: Transition.rightToLeftWithFade);
+                  final DateTime currentTime = DateTime.now();
+                  final DateTime startTime = widget
+                          .post.postBidDetails.startTime.isNotEmpty
+                      ? DateTime.fromMillisecondsSinceEpoch(
+                          extractSeconds(widget.post.postBidDetails.startTime) *
+                              1000)
+                      : DateTime.now();
+                  final DateTime endTime = widget
+                          .post.postBidDetails.endTime.isNotEmpty
+                      ? DateTime.fromMillisecondsSinceEpoch(
+                          extractSeconds(widget.post.postBidDetails.endTime) *
+                              1000)
+                      : DateTime.now();
+
+                  log("Start Time  ${startTime}");
+                  log("End Time  ${endTime}");
+
+                  if (currentTime.isAfter(startTime) &&
+                      currentTime.isBefore(endTime)) {
+                    Get.to(
+                      () => bid(post: widget.post),
+                      transition: Transition.rightToLeftWithFade,
+                    );
+                  } else if (
+                      widget.post.postType == "rent") {
+                    Get.to(
+                      () =>
+                          QueryScreen(post: widget.post), // Replace with your actual query screen widget
+                      transition: Transition.rightToLeftWithFade,
+                    );
+                    log("Query");
+                  } else if (currentTime.isAfter(endTime) || currentTime.isBefore(startTime)) {
+                    Fluttertoast.showToast(
+                      msg: "Bidding is not live right now!",
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.BOTTOM,
+                    );
+                  }
                 },
                 child: Container(
                   height: 60,
                   width: double.maxFinite,
                   decoration: BoxDecoration(
-                      color: Colors.black,
-                      borderRadius: BorderRadius.circular(20)),
+                    color: Colors.black,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
                   child: Center(
-                      child: Text(
-                    'Place Bid',
-                    style: TextStyle(
+                    child: Text(
+                      widget.post.postType == "buy" || widget.post.postType == "bid" ? 'Place Bid' : "Submit Query",
+                      style: TextStyle(
                         fontWeight: FontWeight.w400,
                         fontSize: 15,
                         fontFamily: 'Lexend',
-                        color: Colors.white),
-                  )),
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
                 ),
               ),
             )
@@ -150,13 +221,14 @@ class _detailsState extends State<PostDetailScreen> {
                                       });
 
                                       if (like) {
-                                        await FirebaseFunctions().addPostToFavorites(
-                                            widget.post.id);
+                                        await FirebaseFunctions()
+                                            .addPostToFavorites(widget.post.id);
                                         await LocalStorage.saveLikedPost(
                                             widget.post.id);
                                       } else {
-                                        await FirebaseFunctions().removePostFromFavorites(
-                                            widget.post.id);
+                                        await FirebaseFunctions()
+                                            .removePostFromFavorites(
+                                                widget.post.id);
                                         await LocalStorage.removeLikedPost(
                                             widget.post.id);
                                       }
@@ -193,7 +265,7 @@ class _detailsState extends State<PostDetailScreen> {
                   ],
                 ),
               ),
-              (buy == true)
+              (widget.post.postType == "buy" || widget.post.postType == "bid")
                   ? Padding(
                       padding: const EdgeInsets.only(
                           left: 20.0, right: 20, top: 35, bottom: 15),
@@ -205,12 +277,12 @@ class _detailsState extends State<PostDetailScreen> {
                               borderRadius: BorderRadius.circular(15)),
                           child: Center(
                             child: Padding(
-                              padding:
-                                  const EdgeInsets.only(top: 13.0, left: 10),
+                              padding: const EdgeInsets.only(
+                                  top: 13.0, left: 15, right: 15),
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Column(
                                     crossAxisAlignment:
@@ -230,31 +302,41 @@ class _detailsState extends State<PostDetailScreen> {
                                               fontFamily: 'Lexend')),
                                     ],
                                   ),
-                                  SizedBox(
-                                    height: 40,
-                                    child: SlideCountdownSeparated(
-                                      padding: EdgeInsets.all(10),
-                                      decoration: BoxDecoration(
-                                        color: Colors.black,
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      // showZeroValue: true,
-                                      // shouldShowSeconds: ,
-                                      duration: Duration(
-                                          days: 1,
-                                          hours: 6,
-                                          minutes: 0,
-                                          seconds: 0),
-                                    ),
-                                  )
+                                  // if starttime and end time is not null or empty
+                                  widget.post.postBidDetails.startTime
+                                              .isNotEmpty &&
+                                          widget.post.postBidDetails.endTime
+                                              .isNotEmpty
+                                      ? CountdownTimerWidget(
+                                          startTime: DateTime
+                                              .fromMillisecondsSinceEpoch(
+                                                  extractSeconds(widget
+                                                          .post
+                                                          .postBidDetails
+                                                          .startTime) *
+                                                      1000),
+                                          endTime: DateTime
+                                              .fromMillisecondsSinceEpoch(
+                                                  extractSeconds(widget
+                                                          .post
+                                                          .postBidDetails
+                                                          .endTime) *
+                                                      1000),
+                                        )
+                                      : Center(
+                                          child: Text('Bidding not yet started',
+                                              style: TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w300,
+                                                  fontFamily: 'Lexend',
+                                                  color: Colors.red)),
+                                        ),
                                 ],
                               ),
                             ),
                           )),
                     )
-                  : SizedBox(),
-              (buy == false)
-                  ? Padding(
+                  :  Padding(
                       padding:
                           const EdgeInsets.only(left: 20.0, right: 20, top: 25),
                       child: Row(
@@ -286,27 +368,27 @@ class _detailsState extends State<PostDetailScreen> {
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Text(
-                                'Rs. 50,000',
+                                "Rs. ${widget.post.price.toString()}",
                                 style: TextStyle(
                                     fontSize: 20,
                                     fontFamily: 'Lexend',
                                     fontWeight: FontWeight.w500),
                               ),
-                              Align(
-                                  alignment: Alignment.topRight,
-                                  child: Text(
-                                    'per month',
-                                    style: TextStyle(
-                                        fontSize: 12,
-                                        fontFamily: 'Lexend',
-                                        fontWeight: FontWeight.w300),
-                                  )),
+                              // Align(
+                              //     alignment: Alignment.topRight,
+                              //     child: Text(
+                              //       'per month',
+                              //       style: TextStyle(
+                              //           fontSize: 12,
+                              //           fontFamily: 'Lexend',
+                              //           fontWeight: FontWeight.w300),
+                              //     )),
                             ],
                           )
                         ],
                       ),
-                    )
-                  : SizedBox(),
+                    ),
+              
               Padding(
                 padding: const EdgeInsets.only(left: 20.0, right: 20, top: 16),
                 child: Row(
@@ -334,7 +416,7 @@ class _detailsState extends State<PostDetailScreen> {
                       width: 6,
                     ),
                     Text(
-                      widget.post.latitute,
+                      widget.post.city + ", " + widget.post.state,
                       style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w400,
@@ -347,67 +429,67 @@ class _detailsState extends State<PostDetailScreen> {
                 padding: const EdgeInsets.only(top: 20.0, right: 20, left: 20),
                 child: Row(
                   children: [
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          rent = true;
-                          buy = false;
-                        });
-                      },
-                      child: Container(
-                        height: 50,
-                        width: 76,
-                        decoration: BoxDecoration(
-                            color: (rent == true)
-                                ? '0095D9'.toColor()
-                                : 'F4F5FA'.toColor(),
-                            borderRadius: BorderRadius.circular(20)),
-                        child: Center(
-                            child: Text(
-                          'Rent',
-                          style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: (rent == true)
-                                  ? FontWeight.w700
-                                  : FontWeight.w300,
-                              fontFamily: 'Lexend',
-                              color:
-                                  (rent == true) ? Colors.white : Colors.black),
-                        )),
-                      ),
-                    ),
-                    SizedBox(
-                      width: 9.6,
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          buy = true;
-                          rent = false;
-                        });
-                      },
-                      child: Container(
-                        height: 50,
-                        width: 76,
-                        decoration: BoxDecoration(
-                            color: (buy == true)
-                                ? '0095D9'.toColor()
-                                : 'F4F5FA'.toColor(),
-                            borderRadius: BorderRadius.circular(20)),
-                        child: Center(
-                            child: Text(
-                          'Buy',
-                          style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: (buy == true)
-                                  ? FontWeight.w700
-                                  : FontWeight.w300,
-                              fontFamily: 'Lexend',
-                              color:
-                                  (buy == true) ? Colors.white : Colors.black),
-                        )),
-                      ),
-                    ),
+                    widget.post.postType == "rent"
+                        ? GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                rent = true;
+                                buy = false;
+                              });
+                            },
+                            child: Container(
+                              height: 50,
+                              width: 76,
+                              decoration: BoxDecoration(
+                                  color: (rent == true)
+                                      ? '0095D9'.toColor()
+                                      : 'F4F5FA'.toColor(),
+                                  borderRadius: BorderRadius.circular(20)),
+                              child: Center(
+                                  child: Text(
+                                'Rent',
+                                style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: (rent == true)
+                                        ? FontWeight.w700
+                                        : FontWeight.w300,
+                                    fontFamily: 'Lexend',
+                                    color: (rent == true)
+                                        ? Colors.white
+                                        : Colors.black),
+                              )),
+                            ),
+                          )
+                        : GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                buy = true;
+                                rent = false;
+                              });
+                            },
+                            child: Container(
+                              height: 50,
+                              width: 76,
+                              decoration: BoxDecoration(
+                                  color: (buy == true)
+                                      ? '0095D9'.toColor()
+                                      : 'F4F5FA'.toColor(),
+                                  borderRadius: BorderRadius.circular(20)),
+                              child: Center(
+                                  child: Text(
+                                'Buy',
+                                style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: (buy == true)
+                                        ? FontWeight.w700
+                                        : FontWeight.w300,
+                                    fontFamily: 'Lexend',
+                                    color: (buy == true)
+                                        ? Colors.white
+                                        : Colors.black),
+                              )),
+                            ),
+                          ),
                   ],
                 ),
               ),
@@ -463,7 +545,7 @@ class _detailsState extends State<PostDetailScreen> {
                   ],
                 ),
               ),
-              (buy == true)
+              (widget.post.postType == "buy")
                   ? Padding(
                       padding:
                           const EdgeInsets.only(top: 12.0, right: 20, left: 20),
@@ -487,7 +569,7 @@ class _detailsState extends State<PostDetailScreen> {
                       ),
                     )
                   : SizedBox(),
-              (buy == true)
+              (widget.post.postType == "buy")
                   ? Padding(
                       padding:
                           const EdgeInsets.only(top: 12.0, right: 20, left: 20),
@@ -558,7 +640,7 @@ class _detailsState extends State<PostDetailScreen> {
                               height: 22,
                             ),
                             Text(
-                              'Government',
+                              widget.post.propertyOwnership,
                               style: TextStyle(
                                   fontFamily: 'Lexend',
                                   fontWeight: FontWeight.w400,
@@ -632,38 +714,61 @@ class _detailsState extends State<PostDetailScreen> {
                     SizedBox(
                       width: 10,
                     ),
-                    Text(
-                      widget.post.latitute + " , ${widget.post.longitude}",
-                      style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w300,
-                          fontFamily: 'Lexend'),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.7,
+                      child: Text(
+                        widget.post.address,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w300,
+                            fontFamily: 'Lexend'),
+                      ),
                     )
                   ],
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 20.0, right: 20, top: 30),
-                child: Image.asset('assets/map.png'),
+                child: MapScreen(
+                  latitude: latitude,
+                  longitude: longitude,
+                ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(left: 20.0, right: 20),
-                child: Container(
-                  width: double.maxFinite,
-                  height: 60,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(25),
-                          bottomRight: Radius.circular(25)),
-                      color: 'F4F5FA'.toColor()),
-                  child: Center(
-                      child: Text(
-                    'View on Maps',
-                    style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w500,
-                        fontFamily: 'Lexend'),
-                  )),
+              GestureDetector(
+                onTap: () async {
+                  final String googleMapsUrl =
+                      "https://www.google.com/maps/search/?api=1&query=$latitude,$longitude";
+
+                  log("URL : $googleMapsUrl");
+
+                  launchUrl(Uri.parse(googleMapsUrl)).onError(
+                    (error, stackTrace) {
+                      print("Url is not valid! ${error.toString()}");
+                      return false;
+                    },
+                  );
+                },
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 20.0, right: 20),
+                  child: Container(
+                    width: double.maxFinite,
+                    height: 60,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(25),
+                            bottomRight: Radius.circular(25)),
+                        color: 'F4F5FA'.toColor()),
+                    child: Center(
+                        child: Text(
+                      'View on Maps',
+                      style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          fontFamily: 'Lexend'),
+                    )),
+                  ),
                 ),
               ),
               Padding(
@@ -686,8 +791,7 @@ class _detailsState extends State<PostDetailScreen> {
                       width: 10,
                     ),
                     Text(
-                      widget.post.keywords[0] +
-                          " , ${widget.post.keywords[1]} , ${widget.post.keywords[2]}",
+                      widget.post.keywords.join(', '),
                       style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w300,
@@ -696,255 +800,256 @@ class _detailsState extends State<PostDetailScreen> {
                   ],
                 ),
               ),
-              (buy == true)
-                  ? Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Divider(
-                            thickness: 2,
-                          ),
-                          SizedBox(
-                            height: 20,
-                          ),
-                          Text(
-                            'Top Bidders',
-                            style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
-                                fontFamily: 'Lexend'),
-                          ),
-                          SizedBox(
-                            height: 35,
-                          ),
-                          Container(
-                            height: 70,
-                            width: double.maxFinite,
-                            decoration: BoxDecoration(
-                                color: Color.fromRGBO(239, 99, 86, 0.05),
-                                borderRadius: BorderRadius.circular(12)),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    Stack(
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.all(12.0),
-                                          child: Image.asset('assets/bid1.png'),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Container(
-                                            height: 18,
-                                            width: 18,
-                                            decoration: BoxDecoration(
-                                                color: Colors.black,
-                                                borderRadius:
-                                                    BorderRadius.circular(9)),
-                                            child: Center(
-                                                child: Text(
-                                              '1',
-                                              style: TextStyle(
-                                                  fontSize: 10,
-                                                  color: Colors.white),
-                                            )),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                    SizedBox(
-                                      width: 12,
-                                    ),
-                                    Text(
-                                      'Theresa Webb',
-                                      style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w500,
-                                          fontFamily: 'Lexend'),
-                                    )
-                                  ],
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(right: 17.0),
-                                  child: Row(
-                                    children: [
-                                      Image.asset(
-                                        'assets/fire.png',
-                                        height: 16,
-                                      ),
-                                      Text(
-                                        ' 42,00,000',
-                                        style: TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w500,
-                                            fontFamily: 'Lexend'),
-                                      )
-                                    ],
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                          SizedBox(
-                            height: 15,
-                          ),
-                          Container(
-                            height: 70,
-                            width: double.maxFinite,
-                            decoration: BoxDecoration(
-                                color: Color.fromRGBO(0, 149, 217, 0.05),
-                                borderRadius: BorderRadius.circular(12)),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    Stack(
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.all(12.0),
-                                          child: Image.asset('assets/bid2.png'),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Container(
-                                            height: 18,
-                                            width: 18,
-                                            decoration: BoxDecoration(
-                                                color: Colors.black,
-                                                borderRadius:
-                                                    BorderRadius.circular(9)),
-                                            child: Center(
-                                                child: Text(
-                                              '2',
-                                              style: TextStyle(
-                                                  fontSize: 10,
-                                                  color: Colors.white),
-                                            )),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                    SizedBox(
-                                      width: 12,
-                                    ),
-                                    Text(
-                                      'Darell Steward',
-                                      style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w500,
-                                          fontFamily: 'Lexend'),
-                                    )
-                                  ],
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(right: 17.0),
-                                  child: Row(
-                                    children: [
-                                      Image.asset(
-                                        'assets/fire.png',
-                                        height: 16,
-                                      ),
-                                      Text(
-                                        ' 40,00,000',
-                                        style: TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w500,
-                                            fontFamily: 'Lexend'),
-                                      )
-                                    ],
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                          SizedBox(
-                            height: 15,
-                          ),
-                          Container(
-                            height: 70,
-                            width: double.maxFinite,
-                            decoration: BoxDecoration(
-                                color: Color.fromRGBO(157, 188, 41, 0.05),
-                                borderRadius: BorderRadius.circular(12)),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    Stack(
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.all(12.0),
-                                          child: Image.asset('assets/bid3.png'),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Container(
-                                            height: 18,
-                                            width: 18,
-                                            decoration: BoxDecoration(
-                                                color: Colors.black,
-                                                borderRadius:
-                                                    BorderRadius.circular(9)),
-                                            child: Center(
-                                                child: Text(
-                                              '3',
-                                              style: TextStyle(
-                                                  fontSize: 10,
-                                                  color: Colors.white),
-                                            )),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                    SizedBox(
-                                      width: 12,
-                                    ),
-                                    Text(
-                                      'Mark Jack',
-                                      style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w500,
-                                          fontFamily: 'Lexend'),
-                                    )
-                                  ],
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(right: 17.0),
-                                  child: Row(
-                                    children: [
-                                      Image.asset(
-                                        'assets/fire.png',
-                                        height: 16,
-                                      ),
-                                      Text(
-                                        ' 39,00,000',
-                                        style: TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w500,
-                                            fontFamily: 'Lexend'),
-                                      )
-                                    ],
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  : SizedBox(),
-              Padding(
-                padding:
-                    const EdgeInsets.only(bottom: 20.0, right: 20, left: 20),
-                child: Divider(
-                  thickness: 2,
-                ),
-              ),
+              const SizedBox(height: 20,),
+              // (buy == true)
+              //     ? Padding(
+              //         padding: const EdgeInsets.all(20.0),
+              //         child: Column(
+              //           crossAxisAlignment: CrossAxisAlignment.start,
+              //           children: [
+              //             Divider(
+              //               thickness: 2,
+              //             ),
+              //             SizedBox(
+              //               height: 20,
+              //             ),
+              //             Text(
+              //               'Top Bidders',
+              //               style: TextStyle(
+              //                   fontSize: 18,
+              //                   fontWeight: FontWeight.w500,
+              //                   fontFamily: 'Lexend'),
+              //             ),
+              //             SizedBox(
+              //               height: 35,
+              //             ),
+              //             Container(
+              //               height: 70,
+              //               width: double.maxFinite,
+              //               decoration: BoxDecoration(
+              //                   color: Color.fromRGBO(239, 99, 86, 0.05),
+              //                   borderRadius: BorderRadius.circular(12)),
+              //               child: Row(
+              //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //                 children: [
+              //                   Row(
+              //                     children: [
+              //                       Stack(
+              //                         children: [
+              //                           Padding(
+              //                             padding: const EdgeInsets.all(12.0),
+              //                             child: Image.asset('assets/bid1.png'),
+              //                           ),
+              //                           Padding(
+              //                             padding: const EdgeInsets.all(8.0),
+              //                             child: Container(
+              //                               height: 18,
+              //                               width: 18,
+              //                               decoration: BoxDecoration(
+              //                                   color: Colors.black,
+              //                                   borderRadius:
+              //                                       BorderRadius.circular(9)),
+              //                               child: Center(
+              //                                   child: Text(
+              //                                 '1',
+              //                                 style: TextStyle(
+              //                                     fontSize: 10,
+              //                                     color: Colors.white),
+              //                               )),
+              //                             ),
+              //                           )
+              //                         ],
+              //                       ),
+              //                       SizedBox(
+              //                         width: 12,
+              //                       ),
+              //                       Text(
+              //                         'Theresa Webb',
+              //                         style: TextStyle(
+              //                             fontSize: 15,
+              //                             fontWeight: FontWeight.w500,
+              //                             fontFamily: 'Lexend'),
+              //                       )
+              //                     ],
+              //                   ),
+              //                   Padding(
+              //                     padding: const EdgeInsets.only(right: 17.0),
+              //                     child: Row(
+              //                       children: [
+              //                         Image.asset(
+              //                           'assets/fire.png',
+              //                           height: 16,
+              //                         ),
+              //                         Text(
+              //                           ' 42,00,000',
+              //                           style: TextStyle(
+              //                               fontSize: 15,
+              //                               fontWeight: FontWeight.w500,
+              //                               fontFamily: 'Lexend'),
+              //                         )
+              //                       ],
+              //                     ),
+              //                   )
+              //                 ],
+              //               ),
+              //             ),
+              //             SizedBox(
+              //               height: 15,
+              //             ),
+              //             Container(
+              //               height: 70,
+              //               width: double.maxFinite,
+              //               decoration: BoxDecoration(
+              //                   color: Color.fromRGBO(0, 149, 217, 0.05),
+              //                   borderRadius: BorderRadius.circular(12)),
+              //               child: Row(
+              //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //                 children: [
+              //                   Row(
+              //                     children: [
+              //                       Stack(
+              //                         children: [
+              //                           Padding(
+              //                             padding: const EdgeInsets.all(12.0),
+              //                             child: Image.asset('assets/bid2.png'),
+              //                           ),
+              //                           Padding(
+              //                             padding: const EdgeInsets.all(8.0),
+              //                             child: Container(
+              //                               height: 18,
+              //                               width: 18,
+              //                               decoration: BoxDecoration(
+              //                                   color: Colors.black,
+              //                                   borderRadius:
+              //                                       BorderRadius.circular(9)),
+              //                               child: Center(
+              //                                   child: Text(
+              //                                 '2',
+              //                                 style: TextStyle(
+              //                                     fontSize: 10,
+              //                                     color: Colors.white),
+              //                               )),
+              //                             ),
+              //                           )
+              //                         ],
+              //                       ),
+              //                       SizedBox(
+              //                         width: 12,
+              //                       ),
+              //                       Text(
+              //                         'Darell Steward',
+              //                         style: TextStyle(
+              //                             fontSize: 15,
+              //                             fontWeight: FontWeight.w500,
+              //                             fontFamily: 'Lexend'),
+              //                       )
+              //                     ],
+              //                   ),
+              //                   Padding(
+              //                     padding: const EdgeInsets.only(right: 17.0),
+              //                     child: Row(
+              //                       children: [
+              //                         Image.asset(
+              //                           'assets/fire.png',
+              //                           height: 16,
+              //                         ),
+              //                         Text(
+              //                           ' 40,00,000',
+              //                           style: TextStyle(
+              //                               fontSize: 15,
+              //                               fontWeight: FontWeight.w500,
+              //                               fontFamily: 'Lexend'),
+              //                         )
+              //                       ],
+              //                     ),
+              //                   )
+              //                 ],
+              //               ),
+              //             ),
+              //             SizedBox(
+              //               height: 15,
+              //             ),
+              //             Container(
+              //               height: 70,
+              //               width: double.maxFinite,
+              //               decoration: BoxDecoration(
+              //                   color: Color.fromRGBO(157, 188, 41, 0.05),
+              //                   borderRadius: BorderRadius.circular(12)),
+              //               child: Row(
+              //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //                 children: [
+              //                   Row(
+              //                     children: [
+              //                       Stack(
+              //                         children: [
+              //                           Padding(
+              //                             padding: const EdgeInsets.all(12.0),
+              //                             child: Image.asset('assets/bid3.png'),
+              //                           ),
+              //                           Padding(
+              //                             padding: const EdgeInsets.all(8.0),
+              //                             child: Container(
+              //                               height: 18,
+              //                               width: 18,
+              //                               decoration: BoxDecoration(
+              //                                   color: Colors.black,
+              //                                   borderRadius:
+              //                                       BorderRadius.circular(9)),
+              //                               child: Center(
+              //                                   child: Text(
+              //                                 '3',
+              //                                 style: TextStyle(
+              //                                     fontSize: 10,
+              //                                     color: Colors.white),
+              //                               )),
+              //                             ),
+              //                           )
+              //                         ],
+              //                       ),
+              //                       SizedBox(
+              //                         width: 12,
+              //                       ),
+              //                       Text(
+              //                         'Mark Jack',
+              //                         style: TextStyle(
+              //                             fontSize: 15,
+              //                             fontWeight: FontWeight.w500,
+              //                             fontFamily: 'Lexend'),
+              //                       )
+              //                     ],
+              //                   ),
+              //                   Padding(
+              //                     padding: const EdgeInsets.only(right: 17.0),
+              //                     child: Row(
+              //                       children: [
+              //                         Image.asset(
+              //                           'assets/fire.png',
+              //                           height: 16,
+              //                         ),
+              //                         Text(
+              //                           ' 39,00,000',
+              //                           style: TextStyle(
+              //                               fontSize: 15,
+              //                               fontWeight: FontWeight.w500,
+              //                               fontFamily: 'Lexend'),
+              //                         )
+              //                       ],
+              //                     ),
+              //                   )
+              //                 ],
+              //               ),
+              //             ),
+              //           ],
+              //         ),
+              //       )
+              //     : SizedBox(),
+              // Padding(
+              //   padding:
+              //       const EdgeInsets.only(bottom: 20.0, right: 20, left: 20),
+              //   child: Divider(
+              //     thickness: 2,
+              //   ),
+              // ),
               Padding(
                 padding:
                     const EdgeInsets.only(left: 20.0, right: 20, bottom: 20),
@@ -1242,7 +1347,7 @@ class _detailsState extends State<PostDetailScreen> {
               SizedBox(
                 height: 24,
               ),
-              (buy == false)
+              widget.post.postType == "rent"
                   ? Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
@@ -1258,175 +1363,137 @@ class _detailsState extends State<PostDetailScreen> {
                                     fontSize: 18,
                                     fontFamily: 'Lexend'),
                               ),
-                              Text(
-                                'View all',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w300,
-                                  fontSize: 14,
-                                  fontFamily: 'Lexend',
-                                  decoration: TextDecoration.underline,
+                              GestureDetector(
+                                onTap: () {
+                                  Get.to(() => ViewAllScreen(),
+                                      transition:
+                                          Transition.rightToLeftWithFade);
+                                },
+                                child: Text(
+                                  'View all',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w300,
+                                    fontSize: 14,
+                                    fontFamily: 'Lexend',
+                                    decoration: TextDecoration.underline,
+                                  ),
                                 ),
                               )
                             ],
                           ),
                         ),
-                        SizedBox(
-                          height: 22,
-                        ),
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Padding(
-                            padding:
-                                const EdgeInsets.only(left: 20.0, right: 20),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Stack(
-                                      alignment: AlignmentDirectional.topEnd,
+                        ValueListenableBuilder<List<Post>>(
+                          valueListenable: firebaseFunctions.postsNotifier,
+                          builder: (context, posts, _) {
+                            // Filter posts to include only those with transactionType as "sale"
+                            final salePosts = posts
+                                .where((post) =>
+                                    post.id != widget.post.id &&
+                                    post.postType == "rent")
+                                .toList();
+
+                            log("Sale Posts : ${salePosts.toString()}");
+                            return Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.32,
+                                child: ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  shrinkWrap: true,
+                                  physics: AlwaysScrollableScrollPhysics(),
+                                  itemCount: salePosts.length,
+                                  itemBuilder: (context, index) {
+                                    return Row(
                                       children: [
-                                        Image.asset(
-                                          'assets/ex2.png',
-                                          height: 164,
+                                        PostCardVertical(
+                                            post: salePosts[index]),
+                                        SizedBox(
+                                          width: 15,
                                         ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                              right: 9.0, top: 9),
-                                          child: Container(
-                                            height: 28,
-                                            width: 28,
-                                            decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(14),
-                                                color: '0095D9'.toColor()),
-                                            child: Icon(
-                                              Icons.favorite,
-                                              color: Colors.white,
-                                              size: 14,
-                                            ),
-                                          ),
-                                        )
                                       ],
-                                    ),
-                                    SizedBox(height: 10),
-                                    Padding(
-                                      padding: const EdgeInsets.only(left: 8.0),
-                                      child: Text(
-                                        '16, Sultanpur  ',
-                                        style: TextStyle(
-                                            fontSize: 15,
-                                            fontFamily: 'Lexend',
-                                            fontWeight: FontWeight.w400),
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 5.0, top: 4),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: [
-                                              Image.asset(
-                                                'assets/bloc.png',
-                                                height: 16,
-                                              ),
-                                              Text('0.2 Km away')
-                                            ],
-                                          ),
-                                          SizedBox(width: 23),
-                                          Image.asset(
-                                            'assets/rate.png',
-                                            height: 18,
-                                          )
-                                        ],
-                                      ),
-                                    )
-                                  ],
+                                    );
+                                  },
                                 ),
-                                SizedBox(
-                                  width: 15,
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Stack(
-                                      alignment: AlignmentDirectional.topEnd,
-                                      children: [
-                                        Image.asset(
-                                          'assets/ex1.png',
-                                          height: 164,
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                              right: 9.0, top: 9),
-                                          child: Container(
-                                            height: 28,
-                                            width: 28,
-                                            decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(14),
-                                                color: '0095D9'.toColor()),
-                                            child: Icon(
-                                              Icons.favorite,
-                                              color: Colors.white,
-                                              size: 14,
-                                            ),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                    SizedBox(height: 10),
-                                    Padding(
-                                      padding: const EdgeInsets.only(left: 8.0),
-                                      child: Text(
-                                        '126, Manesar  ',
-                                        style: TextStyle(
-                                            fontSize: 15,
-                                            fontFamily: 'Lexend',
-                                            fontWeight: FontWeight.w400),
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 5.0, top: 4),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: [
-                                              Image.asset(
-                                                'assets/bloc.png',
-                                                height: 16,
-                                              ),
-                                              Text('0.2 Km away')
-                                            ],
-                                          ),
-                                          SizedBox(width: 23),
-                                          Image.asset(
-                                            'assets/rate.png',
-                                            height: 18,
-                                          )
-                                        ],
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
+                              ),
+                            );
+                          },
                         ),
                       ],
                     )
-                  : SizedBox(),
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(left: 20.0, right: 20),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Nearby Properties',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 18,
+                                    fontFamily: 'Lexend'),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  Get.to(() => ViewAllScreen(),
+                                      transition:
+                                          Transition.rightToLeftWithFade);
+                                },
+                                child: Text(
+                                  'View all',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w300,
+                                    fontSize: 14,
+                                    fontFamily: 'Lexend',
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        ValueListenableBuilder<List<Post>>(
+                          valueListenable: firebaseFunctions.postsNotifier,
+                          builder: (context, posts, _) {
+                            // Filter posts to include only those with transactionType as "sale"
+                            final salePosts = posts
+                                .where((post) =>
+                                    post.id != widget.post.id &&
+                                    post.postType == "buy")
+                                .toList();
+
+                            log("Sale Posts : ${salePosts.toString()}");
+                            return Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.32,
+                                child: ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  shrinkWrap: true,
+                                  physics: AlwaysScrollableScrollPhysics(),
+                                  itemCount: salePosts.length,
+                                  itemBuilder: (context, index) {
+                                    return Row(
+                                      children: [
+                                        PostCardVertical(
+                                            post: salePosts[index]),
+                                        SizedBox(
+                                          width: 15,
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
               SizedBox(
                 height: 40,
               )

@@ -13,7 +13,10 @@ class PostCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(builder: (context) => PostDetailScreen(post: post,)));
+        Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
+            builder: (context) => PostDetailScreen(
+                  post: post,
+                )));
       },
       child: Container(
         width: MediaQuery.of(context).size.width,
@@ -23,11 +26,10 @@ class PostCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(25),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(12.0),
+          padding: const EdgeInsets.all(11.0),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              
               ClipRRect(
                 borderRadius: BorderRadius.circular(10.0),
                 child: CachedNetworkImage(
@@ -63,13 +65,12 @@ class PostCard extends StatelessWidget {
                     Text(
                       post.status,
                       style: TextStyle(
-                        fontSize: 13,
-                        fontFamily: 'Lexend',
-                        fontWeight: FontWeight.w300,
-                        color: Colors.green
-                      ),
+                          fontSize: 13,
+                          fontFamily: 'Lexend',
+                          fontWeight: FontWeight.w300,
+                          color: Colors.green),
                     ),
-                    SizedBox(height: 10),
+                    SizedBox(height: 8),
                     Text(
                       "₹ ${post.price.toString()}",
                       style: TextStyle(
@@ -82,13 +83,17 @@ class PostCard extends StatelessWidget {
                     Row(
                       children: [
                         Image.asset('assets/bloc.png', height: 18),
-                        Text(
-                          post.latitute ?? 'Unknown Location',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
+                        SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.4,
+                            child: Text(
+                              post.city,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                  fontSize: 12,
+                                  fontFamily: 'Lexend',
+                                  fontWeight: FontWeight.w400),
+                            ))
                       ],
                     ),
                   ],
