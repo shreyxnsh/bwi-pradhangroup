@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:pradhangroup/Home.dart';
+import 'package:pradhangroup/navigationmenu.dart';
 import 'package:pradhangroup/login/loginUI.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -33,7 +33,7 @@ class _splashState extends State<splash> {
       Timer(
           Duration(seconds: 2, microseconds: 50),
           () => Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: (context) => home())));
+              context, MaterialPageRoute(builder: (context) => NavigationMenu())));
     } else {
       Timer(
           Duration(seconds: 2, microseconds: 50),

@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:pradhangroup/Home.dart';
+import 'package:pradhangroup/navigationmenu.dart';
 import 'package:pradhangroup/main.dart';
 
 class biddone extends StatefulWidget {
@@ -52,7 +52,7 @@ class _biddoneState extends State<biddone> {
                     Navigator.pushReplacement(context,
                         MaterialPageRoute(builder:
                     (context) =>
-                        home()
+                        NavigationMenu()
                     ));
                   },
                     child: Text('Go to Home' , style: TextStyle(fontSize: 16 , fontFamily: 'Lexend' , fontWeight: FontWeight.w400 ,color: '0095D9'.toColor()),)),

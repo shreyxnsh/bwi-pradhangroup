@@ -10,7 +10,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pradhangroup/functions/firebase_functions.dart';
 import 'package:pradhangroup/main.dart';
-import '../Home.dart';
+import '../navigationmenu.dart';
 import 'signupUI.dart';
 
 class OTPVerificationLogin extends StatefulWidget {
@@ -153,7 +153,7 @@ class _OTPVerificationLoginState extends State<OTPVerificationLogin> {
 
           
         await storeUser();
-        Get.to(() => home());
+        Get.to(() => NavigationMenu());
       }).catchError((e) {
         if (FirebaseAuth.instance.currentUser?.uid != null) {
           Fluttertoast.showToast(msg: 'Invalid user Otp...');
@@ -195,7 +195,7 @@ class _OTPVerificationLoginState extends State<OTPVerificationLogin> {
       
 
 
-        Get.to(() => home());
+        Get.to(() => NavigationMenu());
 
         // Navigate to home
         // Navigator.pushReplacement(

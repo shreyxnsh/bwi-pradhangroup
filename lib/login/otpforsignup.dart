@@ -7,7 +7,7 @@ import 'package:pinput/pinput.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pradhangroup/main.dart';
-import '../Home.dart';
+import '../navigationmenu.dart';
 import 'signupUI.dart';
 
 class OTPVerification extends StatefulWidget {
@@ -121,7 +121,7 @@ class _OTPVerificationState extends State<OTPVerification> {
         });
 
 
-        Get.to(() => home());
+        Get.to(() => NavigationMenu());
 
         // Navigate to home
         // Navigator.pushReplacement(

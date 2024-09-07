@@ -2,14 +2,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pradhangroup/main.dart';
 
-class Notificationj extends StatefulWidget {
-  const Notificationj({super.key});
+class NotificationScreen extends StatefulWidget {
+  const NotificationScreen({super.key});
 
   @override
-  State<Notificationj> createState() => _NotificationState();
+  State<NotificationScreen> createState() => _NotificationState();
 }
 
-class _NotificationState extends State<Notificationj> {
+class _NotificationState extends State<NotificationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

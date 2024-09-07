@@ -9,7 +9,7 @@ import 'package:pradhangroup/login/loginUI.dart';
 import 'package:pradhangroup/login/otpforsignup.dart';
 import 'package:pradhangroup/main.dart';
 
-import '../Home.dart';
+import '../navigationmenu.dart';
 
 class signupUI extends StatefulWidget {
   const signupUI({super.key});

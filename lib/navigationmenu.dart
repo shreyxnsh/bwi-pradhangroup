@@ -13,17 +13,17 @@ import 'package:pradhangroup/functions/firebase_functions.dart';
 
 import 'FuncScreen/postDetails.dart';
 import 'Screens/Search.dart';
-import 'Screens/frontpage.dart';
+import 'Screens/HomeScreen.dart';
 
-class home extends StatefulWidget {
-  const home({super.key});
+class NavigationMenu extends StatefulWidget {
+  const NavigationMenu({super.key});
 
   @override
-  State<home> createState() => _homeState();
+  State<NavigationMenu> createState() => _homeState();
 }
 
 
-class _homeState extends State<home> {
+class _homeState extends State<NavigationMenu> {
 
   // store the current user id from firebase in get storage 
 
@@ -60,7 +60,7 @@ class _homeState extends State<home> {
   int pp = 0;
   List<Widget> _buildScreens() {
     return [
-      front(),
+      HomeScreen(),
       FavouriteScreen(),
       Search(),
       Listing(),

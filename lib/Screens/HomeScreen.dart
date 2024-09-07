@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pradhangroup/FuncScreen/Notification.dart';
 import 'package:pradhangroup/FuncScreen/postDetails.dart';
 import 'package:pradhangroup/FuncScreen/rent.dart';
 import 'package:pradhangroup/Screens/Search.dart';
@@ -17,14 +18,14 @@ import 'package:pradhangroup/widgets/post_card_vertical.dart';
 import '../FuncScreen/bidScreen.dart';
 import '../FuncScreen/brb.dart';
 
-class front extends StatefulWidget {
-  const front({super.key});
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
 
   @override
-  State<front> createState() => _frontState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _frontState extends State<front> {
+class _HomeScreenState extends State<HomeScreen> {
   bool all = true;
   bool top = false;
   bool manesar = false;
@@ -116,20 +117,25 @@ class _frontState extends State<front> {
                   ),
                   Row(
                     children: [
-                      Container(
-                          height: 40,
-                          width: 40,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(color: 'F0F0F0'.toColor())),
-                          child: Padding(
-                            padding: const EdgeInsets.all(5.0),
-                            child: Image.asset(
-                              'assets/noti.png',
-                              height: 10,
-                              width: 10,
-                            ),
-                          )),
+                      GestureDetector(
+                        onTap: (){
+                          Get.to(() => NotificationScreen(), transition: Transition.rightToLeftWithFade); 
+                        },
+                        child: Container(
+                            height: 40,
+                            width: 40,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(color: 'F0F0F0'.toColor())),
+                            child: Padding(
+                              padding: const EdgeInsets.all(5.0),
+                              child: Image.asset(
+                                'assets/noti.png',
+                                height: 10,
+                                width: 10,
+                              ),
+                            )),
+                      ),
                       SizedBox(width: 15),
                       GestureDetector(
                         onTap: () {

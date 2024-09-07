@@ -217,14 +217,11 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                       Container(
                         height: 55,
                         width: 55,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(27.5),
-                          color: 'F4F5FA'.toColor(),
-                        ),
-                        child: Icon(
-                          Icons.settings_outlined,
-                          size: 22,
-                        ),
+                        // decoration: BoxDecoration(
+                        //   borderRadius: BorderRadius.circular(27.5),
+                        //   color: 'F4F5FA'.toColor(),
+                        // ),
+                      
                       ),
                     ],
                   ),

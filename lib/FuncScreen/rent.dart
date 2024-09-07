@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:pradhangroup/Screens/Search.dart';
 import 'package:pradhangroup/functions/firebase_functions.dart';
 import 'package:pradhangroup/main.dart';
 import 'package:pradhangroup/widgets/post_card.dart';
@@ -61,16 +63,21 @@ class _rentState extends State<rent> {
                         fontFamily: 'Lexend',
                         fontSize: 18),
                   ),
-                  Container(
-                    height: 55,
-                    width: 55,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(27.5),
-                      color: 'F4F5FA'.toColor(),
-                    ),
-                    child: Icon(
-                      Icons.search_outlined,
-                      size: 18,
+                  GestureDetector(
+                     onTap: () {
+                      Get.to(() => Search() , transition: Transition.rightToLeftWithFade);
+                    },
+                    child: Container(
+                      height: 55,
+                      width: 55,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(27.5),
+                        color: 'F4F5FA'.toColor(),
+                      ),
+                      child: Icon(
+                        Icons.search_outlined,
+                        size: 18,
+                      ),
                     ),
                   ),
                 ],

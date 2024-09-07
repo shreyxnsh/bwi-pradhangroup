@@ -8,6 +8,7 @@ import 'package:pradhangroup/FuncScreen/Notification.dart';
 import 'package:pradhangroup/FuncScreen/profilesetting.dart';
 import 'package:pradhangroup/Screens/Search.dart';
 import 'package:pradhangroup/Screens/favourites.dart';
+import 'package:pradhangroup/Screens/helpCenter.dart';
 import 'package:pradhangroup/functions/firebase_functions.dart';
 import 'package:pradhangroup/functions/userdata_service.dart';
 import 'package:pradhangroup/login/loginUI.dart';
@@ -198,7 +199,7 @@ class _ProfileState extends State<Profile> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => Notificationj()),
+                            builder: (context) => NotificationScreen()),
                       );
                     },
                     child: Row(
@@ -223,23 +224,29 @@ class _ProfileState extends State<Profile> {
                   SizedBox(
                     height: 40,
                   ),
-                  Row(
-                    children: [
-                      Image.asset(
-                        'assets/profile/Chat.png',
-                        height: 18,
-                      ),
-                      SizedBox(
-                        width: 15,
-                      ),
-                      Text(
-                        'Help Center',
-                        style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                            fontFamily: 'Lexend'),
-                      ),
-                    ],
+                  GestureDetector(
+                    onTap: () {
+                      Get.to(() => HelpCenterScreen(),
+                          transition: Transition.rightToLeftWithFade);
+                    },
+                    child: Row(
+                      children: [
+                        Image.asset(
+                          'assets/profile/Chat.png',
+                          height: 18,
+                        ),
+                        SizedBox(
+                          width: 15,
+                        ),
+                        Text(
+                          'Help Center',
+                          style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
+                              fontFamily: 'Lexend'),
+                        ),
+                      ],
+                    ),
                   ),
                   SizedBox(
                     height: 40,

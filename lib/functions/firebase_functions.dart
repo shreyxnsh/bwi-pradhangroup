@@ -86,7 +86,7 @@ Future<void> fetchPostsFromFirestore() async {
         propertyId: data['propertyId'] ?? 'Unknown Property ID',
         shortDescription: data['shortDescription'] ?? 'No Description',
         description: data['description'] ?? 'No Description',
-        status: data['status'] ?? 'Unknown Status',
+        status: data['bidDetails']?['status'] ?? 'Unknown Status',
         approvalStatus: data['approvalStatus'] ?? 'Unknown Approval Status',
         email: data['contactDetails']?['email'] ?? 'No Email',
         phone: data['contactDetails']?['phoneNo'] ?? 'No Phone Number',
@@ -202,9 +202,9 @@ Future<void> fetchPostsFromFirestore() async {
                   'No Ownership Info',
               transactionType: data['otherDetails']?['transactionType'] ??
                   'No Transaction Type',
-              avgRating: data['ratings']?['average'].toString() ?? 'No Rating',
+              avgRating: data['ratings']?['average'].toString() ?? '0',
               totalRating:
-                  data['ratings']?['total'].toString() ?? 'No Total Rating',
+                  data['ratings']?['total'].toString() ?? '0',
               tags: data['tags'] != null ? List<String>.from(data['tags']) : [],
               keywords: data['keywords'] != null
                   ? List<String>.from(data['keywords'])
@@ -370,6 +370,7 @@ class Post {
   final String totalRating;
   final List<String> tags;
   final List<String> keywords;
+
   // final String createdAt;
   // final String updatedAt;
   final PostBidDetails postBidDetails;
@@ -403,6 +404,7 @@ class Post {
     required this.totalRating,
     required this.tags,
     required this.keywords,
+
     // required this.createdAt,
     // required this.updatedAt,
     required this.postBidDetails,

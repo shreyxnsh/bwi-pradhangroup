@@ -1,6 +1,8 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:pradhangroup/Screens/Search.dart';
 import 'package:pradhangroup/functions/firebase_functions.dart';
 import 'package:pradhangroup/main.dart';
 import 'package:pradhangroup/widgets/post_card.dart';
@@ -61,16 +63,21 @@ class _BidScreenState extends State<BidScreen> {
                         fontFamily: 'Lexend',
                         fontSize: 18),
                   ),
-                  Container(
-                    height: 55,
-                    width: 55,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(27.5),
-                      color: 'F4F5FA'.toColor(),
-                    ),
-                    child: Icon(
-                      Icons.search_outlined,
-                      size: 18,
+                  GestureDetector(
+                     onTap: () {
+                      Get.to(() => Search() , transition: Transition.rightToLeftWithFade);
+                    },
+                    child: Container(
+                      height: 55,
+                      width: 55,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(27.5),
+                        color: 'F4F5FA'.toColor(),
+                      ),
+                      child: Icon(
+                        Icons.search_outlined,
+                        size: 18,
+                      ),
                     ),
                   ),
                 ],
@@ -183,7 +190,8 @@ class _BidScreenState extends State<BidScreen> {
                 valueListenable: firebaseFunctions.postsNotifier,
                 builder: (context, posts, _) {
                   // Filter posts based on the selected tab
-                  final filteredPosts = _filterPosts(posts.where((post) => post.postType == 'bid').toList());
+                  final filteredPosts = _filterPosts(
+                      posts.where((post) => post.postType == 'bid').toList());
 
                   return ListView.builder(
                     shrinkWrap: true,
@@ -205,7 +213,7 @@ class _BidScreenState extends State<BidScreen> {
     );
   }
 
-    int extractSeconds(String timestamp) {
+  int extractSeconds(String timestamp) {
     RegExp regex = RegExp(r"seconds=(\d+),");
     Match? match = regex.firstMatch(timestamp);
     if (match != null) {
@@ -215,42 +223,38 @@ class _BidScreenState extends State<BidScreen> {
   }
 
   List<Post> _filterPosts(List<Post> posts) {
-     final DateTime currentTime = DateTime.now();
-     log("Posts : ${posts.toString()}" , name: "TABS");
+    final DateTime currentTime = DateTime.now();
+    log("Posts : ${posts.toString()}", name: "TABS");
 
     if (all) {
       return posts.where((post) => post.postType == 'bid').toList();
     } else if (ongoing) {
       return posts.where((post) {
-        log("Start Time : ${post.postBidDetails.startTime}" , name: "TABS");
-        log("End Time : ${post.postBidDetails.endTime}" , name: "TABS");
-        log("End Time : ${post.postBidDetails.toString()}" , name: "TABS");
+        log("Start Time : ${post.postBidDetails.startTime}", name: "TABS");
+        log("End Time : ${post.postBidDetails.endTime}", name: "TABS");
+        log("End Time : ${post.postBidDetails.toString()}", name: "TABS");
 
-        
-        final DateTime startTime =  DateTime.fromMillisecondsSinceEpoch(
-                          extractSeconds(post.postBidDetails.startTime) *
-                              1000);
+        final DateTime startTime = DateTime.fromMillisecondsSinceEpoch(
+            extractSeconds(post.postBidDetails.startTime) * 1000);
         final DateTime endTime = DateTime.fromMillisecondsSinceEpoch(
-                          extractSeconds(post.postBidDetails.endTime) *
-                              1000);
+            extractSeconds(post.postBidDetails.endTime) * 1000);
 
-                              log("Start Time after conversion : ${startTime.toString()}" , name: "TABS");
-                              log("End Time after conversion : ${endTime.toString()}" , name: "TABS");
+        log("Start Time after conversion : ${startTime.toString()}",
+            name: "TABS");
+        log("End Time after conversion : ${endTime.toString()}", name: "TABS");
         return post.postType == 'bid' &&
             currentTime.isAfter(startTime) &&
-                      currentTime.isBefore(endTime);
+            currentTime.isBefore(endTime);
 
-            // currentTime.isAfter(startTime)
+        // currentTime.isAfter(startTime)
       }).toList();
     } else if (upcoming) {
       return posts.where((post) {
-        final DateTime startTime =  DateTime.fromMillisecondsSinceEpoch(
-                          extractSeconds(post.postBidDetails.startTime) *
-                              1000);
+        final DateTime startTime = DateTime.fromMillisecondsSinceEpoch(
+            extractSeconds(post.postBidDetails.startTime) * 1000);
         return post.postType == 'bid' && currentTime.isBefore(startTime);
       }).toList();
     }
     return [];
   }
 }
-
